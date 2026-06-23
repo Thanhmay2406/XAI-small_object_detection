@@ -1,0 +1,11 @@
+numpy>=1.26
+pandas>=2.2
+PyYAML>=6.0
+matplotlib>=3.8
+opencv-python>=4.10
+Pillow>=10.0
+tqdm>=4.66
+torch>=2.3
+torchvision>=0.18
+ultralytics>=8.3
+pytest>=8.2

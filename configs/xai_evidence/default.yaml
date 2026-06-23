@@ -1,0 +1,9 @@
+feature_levels:
+  - P2
+  - P3
+  - P4
+
+saliency_method: activation_mean
+small_object_only: true
+allowed_drop: 0.0
+epsilon: 1.0e-6

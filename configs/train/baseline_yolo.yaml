@@ -1,0 +1,9 @@
+experiment_name: baseline_yolo_seed0
+seed: 0
+device: cpu
+data: configs/dataset/example_yolo.yaml
+model: configs/model/yolo_baseline.yaml
+imgsz: 640
+epochs: 1
+batch: 4
+project_dir: experiments
