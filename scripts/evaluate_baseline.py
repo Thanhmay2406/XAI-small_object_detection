@@ -26,6 +26,7 @@ from xai_evidence_sod.utils.config import ensure_dir, ensure_file, load_yaml_con
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Evaluate the baseline YOLO detector.")
     parser.add_argument("--config", default="configs/train/baseline_drill_bit_yolov8n.yaml")
+    parser.add_argument("--data", default=None, help="Optional dataset YAML override.")
     parser.add_argument("--weights", required=True)
     parser.add_argument("--device", default=None)
     parser.add_argument("--split", default=None, help="Dataset split to evaluate, default from config.")
@@ -39,7 +40,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = build_parser().parse_args()
     config = load_yaml_config(args.config)
-    dataset_yaml = ensure_file(config["dataset"], "Dataset YAML")
+    dataset_yaml = ensure_file(args.data or config["dataset"], "Dataset YAML")
     weights_path = YoloBaselineRunner.require_weights(args.weights)
     output_dir = ensure_dir(args.output or config["eval_project_dir"], "Evaluation output directory", create=True)
 
