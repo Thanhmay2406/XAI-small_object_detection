@@ -12,6 +12,7 @@ from xai_evidence_sod.utils.config import ensure_file, load_yaml_config
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Train the baseline YOLO detector.")
     parser.add_argument("--config", default="configs/train/baseline_drill_bit_yolov8n.yaml")
+    parser.add_argument("--data", default=None, help="Optional dataset YAML override.")
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--device", default=None)
     parser.add_argument("--epochs", type=int, default=None)
@@ -27,7 +28,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = build_parser().parse_args()
     config = load_yaml_config(args.config)
-    dataset_yaml = ensure_file(config["dataset"], "Dataset YAML")
+    dataset_yaml = ensure_file(args.data or config["dataset"], "Dataset YAML")
 
     run_name = args.name or str(config["experiment_name"])
     project_dir = args.project_dir or str(config["project_dir"])
