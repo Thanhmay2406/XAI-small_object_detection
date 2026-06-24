@@ -197,3 +197,236 @@ Risks / open questions:
 
 - Empty-label images may still hide annotation misses, so manual review remains necessary
 - `Chipped` smoke false negatives are useful for readiness review but not for scientific claims
+
+### Phase 4 - Baseline error analysis and evidence preparation
+
+- Goal: lock the full baseline result as the official comparison point, analyze where the baseline fails, and prepare reproducible artifacts for later XAI/evidence inspection.
+
+Files created:
+
+- `src/xai_evidence_sod/evaluation/error_analysis.py`
+- `scripts/analyze_baseline_errors.py`
+- `scripts/export_error_gallery.py`
+- `docs/phase4_error_analysis_and_evidence_plan.md`
+
+Files modified:
+
+- `src/xai_evidence_sod/evaluation/__init__.py`
+- `docs/baseline_phase3_report.md`
+- `docs/experiment_log.md`
+
+Commands to run:
+
+- `.venv/bin/python -m compileall src scripts`
+- `PYTHONPATH=src .venv/bin/python scripts/analyze_baseline_errors.py --eval-dir artifacts/baseline_eval --data configs/dataset/drill_bit_yolo.yaml --output artifacts/baseline_error_analysis --focus-class Chipped`
+- `PYTHONPATH=src .venv/bin/python scripts/export_error_gallery.py --csv artifacts/baseline_error_analysis/focus_class_error_cases.csv --output artifacts/baseline_error_gallery --num-samples 32 --seed 0`
+
+Expected outputs:
+
+- `artifacts/baseline_error_analysis/error_summary.json`
+- `artifacts/baseline_error_analysis/per_class_error_summary.csv`
+- `artifacts/baseline_error_analysis/focus_class_error_summary.json`
+- `artifacts/baseline_error_analysis/focus_class_error_cases.csv`
+- `artifacts/baseline_error_analysis/size_bin_error_summary.csv`
+- `artifacts/baseline_error_analysis/confidence_error_summary.csv`
+- `artifacts/baseline_error_gallery/sampled_errors.csv`
+- `artifacts/baseline_error_gallery/error_gallery_contact_sheet.jpg`
+
+Checks performed:
+
+- `compileall` passed after adding the new evaluation helpers and scripts
+- baseline error analysis ran successfully on `artifacts/baseline_eval`
+- manual-review gallery export ran successfully on the `Chipped` focus-class CSV
+
+Risks / open questions:
+
+- Current error taxonomy is heuristic because exported artifacts do not yet include per-GT matching assignments, saliency maps, or feature activations
+- The dataset should still be framed as weak-evidence / hard-class detection rather than a strongly tiny-object dataset
+- `Chipped` remains the highest-priority class for Phase 5 evidence-map inspection, but some near-threshold and cross-class overlaps may also indicate annotation ambiguity
+
+### Phase 5 - XAI evidence extraction on curated baseline cases
+
+- Goal: run post-hoc XAI evidence extraction on a curated `Chipped` subset using the locked baseline checkpoint, without retraining or changing the detector.
+
+Files created:
+
+- `src/xai_evidence_sod/xai/case_selection.py`
+- `src/xai_evidence_sod/xai/cam.py`
+- `src/xai_evidence_sod/xai/evidence_metrics.py`
+- `src/xai_evidence_sod/xai/evidence_pipeline.py`
+- `scripts/extract_xai_evidence.py`
+- `docs/phase5_xai_evidence_extraction.md`
+
+Files modified:
+
+- `src/xai_evidence_sod/xai/__init__.py`
+- `docs/experiment_log.md`
+
+Commands to run:
+
+- `.venv/bin/python -m compileall src scripts`
+- `PYTHONPATH=src .venv/bin/python scripts/extract_xai_evidence.py --weights experiments/baseline_drill_bit/weights/best.pt --data configs/dataset/drill_bit_yolo.yaml --cases artifacts/baseline_error_analysis/focus_class_error_cases.csv --output artifacts/xai_evidence_chipped --focus-class Chipped --methods eigencam --max-cases 16 --seed 0`
+- `PYTHONPATH=src .venv/bin/python scripts/extract_xai_evidence.py --weights experiments/baseline_drill_bit/weights/best.pt --data configs/dataset/drill_bit_yolo.yaml --cases artifacts/baseline_error_analysis/focus_class_error_cases.csv --output artifacts/xai_evidence_chipped --focus-class Chipped --methods eigencam --max-cases 64 --seed 0`
+
+Expected outputs:
+
+- `artifacts/xai_evidence_chipped/evidence_cases.csv`
+- `artifacts/xai_evidence_chipped/evidence_summary.json`
+- `artifacts/xai_evidence_chipped/overlays/`
+- `artifacts/xai_evidence_chipped/crops/`
+- `artifacts/xai_evidence_chipped/maps/`
+- `artifacts/xai_evidence_chipped/contact_sheets/`
+- `artifacts/xai_evidence_chipped/README.md`
+
+Checks performed:
+
+- `compileall` passed after adding the Phase 5 XAI modules and CLI
+- smoke extraction with `--max-cases 16` passed
+- full extraction with `--max-cases 64` passed
+
+Risks / open questions:
+
+- Only `EigenCAM` is implemented in Phase 5; `Grad-CAM` and `Grad-CAM++` are scaffolded but intentionally left unimplemented until the YOLO target interface is stabilized
+- Evidence metrics are descriptive post-hoc summaries and should not be read as proof that the detector causally uses the highlighted pixels
+- `true_positive_proxy` rows are reconstructed from exported predictions and labels rather than coming from a native validator match export
+
+### Phase 6 - Evidence review and failure-mode comparison
+
+- Goal: compare descriptive Phase 5 EigenCAM evidence patterns across curated `Chipped` case groups and export a manual-review shortlist for Phase 7 scoping, without retraining or changing the detector.
+
+Files created:
+
+- `src/xai_evidence_sod/xai/evidence_review.py`
+- `scripts/review_xai_evidence.py`
+- `docs/phase6_evidence_review.md`
+
+Files modified:
+
+- `src/xai_evidence_sod/xai/__init__.py`
+- `docs/experiment_log.md`
+
+Commands to run:
+
+- `.venv/bin/python -m compileall src scripts`
+- `PYTHONPATH=src .venv/bin/python scripts/review_xai_evidence.py --evidence-csv artifacts/xai_evidence_chipped/evidence_cases.csv --output artifacts/xai_evidence_review_chipped --focus-class Chipped --top-k 8`
+
+Expected outputs:
+
+- `artifacts/xai_evidence_review_chipped/evidence_group_summary.csv`
+- `artifacts/xai_evidence_review_chipped/evidence_group_summary.json`
+- `artifacts/xai_evidence_review_chipped/representative_cases.csv`
+- `artifacts/xai_evidence_review_chipped/review_notes_template.csv`
+- `artifacts/xai_evidence_review_chipped/README.md`
+- optional `artifacts/xai_evidence_review_chipped/evidence_group_means.png`
+- optional `artifacts/xai_evidence_review_chipped/peak_inside_gt_rate.png`
+
+Checks performed:
+
+- `compileall` passed after adding the Phase 6 review module and CLI
+- the requested review command ran successfully on `artifacts/xai_evidence_chipped/evidence_cases.csv`
+- review artifacts were exported with relative paths and optional plots
+
+Current quantitative snapshot:
+
+- `false_negative` mean `energy_in_gt_box`: `0.0072`
+- `false_negative` `peak_inside_gt_box_rate`: `0.0`
+- `localization_error` mean `energy_in_gt_box`: `0.1432`
+- `near_threshold_overlap` count: `24`
+- representative review buckets exported: `7` buckets x `8` rows each
+
+Risks / open questions:
+
+- Phase 6 remains descriptive only and does not justify causal claims about detector reasoning
+- the `true_positive_proxy` group is heterogeneous, with a low median GT-box energy despite a higher mean driven by outliers
+- some `false_positive` rows retain high GT-box energy, so taxonomy and overlap structure still need manual review before Phase 7 hypotheses are tightened
+
+### Phase 7 - Manual evidence review and intervention design
+
+- Goal: standardize manual review for the Phase 6 representative `Chipped` evidence cases and define a Phase 8 intervention decision gate without training any intervention.
+
+Files created:
+
+- `src/xai_evidence_sod/xai/manual_review.py`
+- `scripts/prepare_manual_evidence_review.py`
+- `docs/phase7_manual_evidence_review.md`
+
+Files modified:
+
+- `src/xai_evidence_sod/xai/__init__.py`
+- `docs/experiment_log.md`
+
+Commands to run:
+
+- `.venv/bin/python -m compileall src scripts`
+- `PYTHONPATH=src .venv/bin/python scripts/prepare_manual_evidence_review.py --representatives artifacts/xai_evidence_review_chipped/representative_cases.csv --group-summary artifacts/xai_evidence_review_chipped/evidence_group_summary.csv --output artifacts/manual_evidence_review_chipped --focus-class Chipped`
+
+Expected outputs:
+
+- `artifacts/manual_evidence_review_chipped/manual_review_template.csv`
+- `artifacts/manual_evidence_review_chipped/manual_review_guide.md`
+- `artifacts/manual_evidence_review_chipped/intervention_decision_table.md`
+- `artifacts/manual_evidence_review_chipped/README.md`
+- optional `artifacts/manual_evidence_review_chipped/manual_review_summary.csv`
+- optional `artifacts/manual_evidence_review_chipped/manual_review_summary.json`
+
+Checks performed:
+
+- `compileall` passed after adding the Phase 7 manual-review module and CLI
+- the requested Phase 7 preparation command ran successfully
+- the output template was exported with relative paths and controlled review fields
+
+Current run status:
+
+- `manual_review_template.csv` contains the requested review columns plus Phase 6-derived metadata such as `bucket`, `error_type`, and `tags`
+- `manual_review_guide.md` records the review workflow and allowed categorical values
+- `intervention_decision_table.md` defines the Phase 8 gate for `hard_sample_weighting`, `chipped_focused_augmentation`, `background_negative_mining`, `label_review`, `cross_method_xai_check`, and `no_action`
+- no `manual_review_summary.*` files were produced yet because `artifacts/manual_evidence_review_chipped/manual_review_filled.csv` does not exist at this point
+
+Risks / open questions:
+
+- Phase 7 remains workflow and hypothesis preparation only; it does not validate any intervention
+- manual review quality will depend on consistent use of the controlled fields across buckets
+- if many rows end up marked `cam_method_uncertain` or `uncertain`, a cross-method post-hoc check may be needed before Phase 8
+
+### Phase 8 - Evidence-to-intervention decision design
+
+- Goal: translate Phase 6 evidence buckets and Phase 7 review infrastructure into a conservative intervention-design layer without running training or changing model/XAI code.
+
+Files created:
+
+- `src/xai_evidence_sod/xai/intervention_design.py`
+- `scripts/design_phase8_interventions.py`
+- `docs/phase8_intervention_design.md`
+
+Files modified:
+
+- `src/xai_evidence_sod/xai/__init__.py`
+- `docs/experiment_log.md`
+
+Commands run:
+
+- `PYTHONPATH=src .venv/bin/python scripts/design_phase8_interventions.py --representatives artifacts/xai_evidence_review_chipped/representative_cases.csv --group-summary artifacts/xai_evidence_review_chipped/evidence_group_summary.csv --manual-review-summary artifacts/manual_evidence_review_chipped/manual_review_summary.csv --manual-review-filled artifacts/manual_evidence_review_chipped/manual_review_filled.csv --output artifacts/intervention_design_chipped --focus-class Chipped`
+- `.venv/bin/python -m compileall src scripts`
+
+Outputs created:
+
+- `artifacts/intervention_design_chipped/intervention_decision_table.csv`
+- `artifacts/intervention_design_chipped/intervention_decision_table.json`
+- `artifacts/intervention_design_chipped/intervention_candidates.csv`
+- `artifacts/intervention_design_chipped/intervention_candidates.json`
+- `artifacts/intervention_design_chipped/no_intervention_or_insufficient_evidence.csv`
+- `artifacts/intervention_design_chipped/README.md`
+
+Current run status:
+
+- the decision-design script completed successfully on the current artifacts
+- the output README records `manual_review_source = demo_or_synthetic`
+- `manual_review_used_as_research_evidence = false` is enforced in the generated JSON/README
+- most buckets remain `NO_INTERVENTION_YET`, with only cautious Phase 9 design candidates exported for `DATA_SAMPLING_OR_CURRICULUM` and `SALIENCY_GUIDED_ATTENTION_PROTOTYPE`
+- no training, architecture changes, loss changes, or XAI extraction changes were introduced in this phase
+
+Risks / open questions:
+
+- current manual-review inputs are smoke-demo artifacts and cannot be used as real research evidence
+- candidate interventions remain hypothesis-level only until real manual review is completed
+- false-positive and near-threshold buckets still need better disambiguation before any intervention is justified

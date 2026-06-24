@@ -58,6 +58,33 @@ PYTHONPATH=src .venv/bin/python scripts/evaluate_baseline.py \
 - prediction sample images
 - `Chipped` error-case CSV
 
+## Official full baseline snapshot
+
+These are the full-run baseline artifacts to treat as the official comparison point for later phases, not the earlier smoke outputs.
+
+- Overall mAP50-95: `0.3686`
+- Overall mAP50: `0.6965`
+- Overall mAP75: `0.3314`
+- Per-class AP50-95:
+- `Broken`: `0.5663`
+- `Chipped`: `0.2685`
+- `Scratched`: `0.2874`
+- `Severe_Rust`: `0.2742`
+- `Tip_Wear`: `0.4464`
+
+## Phase 4 follow-up
+
+- Error-analysis script: `scripts/analyze_baseline_errors.py`
+- Gallery export script: `scripts/export_error_gallery.py`
+- Phase 4 plan/report: `docs/phase4_error_analysis_and_evidence_plan.md`
+
+Key observations from the full baseline error analysis:
+
+- `Chipped` remains the hardest and most relevant class for the current weak-evidence framing.
+- The official `Chipped` false-negative count is `79`, consistent with the earlier evaluation export.
+- Many `Chipped` misses are complete misses, but a smaller review-worthy subset has non-zero or near-threshold overlap and should be prioritized in Phase 5.
+- These findings support targeted evidence inspection, not any claim that XAI already improves the detector.
+
 ## Phase 3.5 sanity helpers
 
 - Empty-label spot-check: `scripts/spot_check_empty_labels.py`
