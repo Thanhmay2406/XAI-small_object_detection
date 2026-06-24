@@ -430,3 +430,37 @@ Risks / open questions:
 - current manual-review inputs are smoke-demo artifacts and cannot be used as real research evidence
 - candidate interventions remain hypothesis-level only until real manual review is completed
 - false-positive and near-threshold buckets still need better disambiguation before any intervention is justified
+
+### Phase 8.5 - Real manual review completion support
+
+- Goal: prepare a clean real-review handoff so the synthetic Phase 7 smoke review can be replaced by real manual annotation without changing training, architecture, loss, or XAI extraction code.
+
+Files created:
+
+- `docs/phase8_5_real_manual_review.md`
+- `scripts/validate_manual_review_real.py`
+
+Outputs created:
+
+- `artifacts/manual_evidence_review_chipped/manual_review_real_template.csv`
+- `artifacts/manual_evidence_review_chipped/real_manual_review_checklist.md`
+- `artifacts/manual_evidence_review_chipped/manual_review_real_validation.json`
+
+Commands run:
+
+- `PYTHONPATH=src .venv/bin/python scripts/validate_manual_review_real.py --manual-review artifacts/manual_evidence_review_chipped/manual_review_filled.csv --output artifacts/manual_evidence_review_chipped/manual_review_real_validation.json`
+- `.venv/bin/python -m compileall src scripts`
+
+Current run status:
+
+- `manual_review_filled.csv` is still detected as `demo_or_synthetic`
+- validation failed intentionally because synthetic markers remain in `reviewer_notes`
+- `manual_review_used_as_research_evidence = false` remains the correct state
+- a clean `manual_review_real_template.csv` is now available for real review completion
+- Phase 7 summary and Phase 8 decision design were not rerun because no real review has been completed yet
+
+Risks / open questions:
+
+- replacing `manual_review_filled.csv` should be done only after the real template is actually reviewed
+- the highest-priority buckets remain `localization_misaligned_evidence` and `near_threshold_high_evidence`
+- Phase 9 is still blocked until real review validation passes and downstream summaries are regenerated

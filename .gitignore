@@ -5,12 +5,15 @@ __pycache__/
 data/
 artifacts/
 experiments/
+runs/
 notebooks/
 paper/
 tests/
 
 *.pt
 *.pth
+*.onnx
+*.engine
 *.cache
 
 .DS_Store
