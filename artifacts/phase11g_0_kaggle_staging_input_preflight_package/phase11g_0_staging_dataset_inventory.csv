@@ -1,0 +1,4 @@
+split,image_dir_exists,label_dir_exists,image_count,label_count,count_difference,notes
+train,true,true,4219,4219,0,images may be symlinks; counts include symlinked image entries
+valid,true,true,916,916,0,images may be symlinks; counts include symlinked image entries
+test,true,true,906,906,0,images may be symlinks; counts include symlinked image entries

@@ -1,0 +1,49 @@
+{
+  "phase": "11G.0",
+  "status": "phase11g_0_kaggle_staging_input_preflight_package_prepared",
+  "source_phase11f_ready": true,
+  "source_phase11f_1_ready": true,
+  "staging_dataset_copy_exists": true,
+  "staging_yaml_exists": true,
+  "local_staging_yaml_has_local_absolute_path": true,
+  "kaggle_yaml_template_prepared": true,
+  "kaggle_notebook_commands_prepared": true,
+  "training_executed": false,
+  "evaluation_executed": false,
+  "inference_executed": false,
+  "original_dataset_mutated": false,
+  "staging_dataset_mutated_by_phase11g_0": false,
+  "ready_for_kaggle_upload_of_staging_dataset": true,
+  "ready_for_phase11g_training_after_kaggle_preflight": false,
+  "next_allowed_step": "upload_phase9s_staging_dataset_copy_to_kaggle_and_run_phase11g_preflight",
+  "phase11f_summary_path": "artifacts/phase11f_approved_staging_training_execution_package/phase11f_execution_package_summary.json",
+  "phase11f_1_summary_path": "artifacts/phase11f_1_kaggle_execution_adapter_package/phase11f_1_kaggle_adapter_summary.json",
+  "staging_dataset_copy_path": "artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_copy",
+  "staging_yaml_path": "artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_drill_bit_yolo.yaml",
+  "phase11f_guardrail_failures": [],
+  "phase11f_1_guardrail_failures": [],
+  "split_inventory": [
+    {
+      "split": "train",
+      "image_count": 4219,
+      "label_count": 4219,
+      "count_difference": 0,
+      "directories_ready": true
+    },
+    {
+      "split": "valid",
+      "image_count": 916,
+      "label_count": 916,
+      "count_difference": 0,
+      "directories_ready": true
+    },
+    {
+      "split": "test",
+      "image_count": 906,
+      "label_count": 906,
+      "count_difference": 0,
+      "directories_ready": true
+    }
+  ],
+  "generated_at_utc": "2026-06-27T09:40:56.043052+00:00"
+}

@@ -1,0 +1,19 @@
+phase: Phase 9V
+purpose: staging_dataset_training_config_preparation_only
+target_class: Chipped
+data: /home/thanhmay/workspace/XAI-small_object_detection/artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_drill_bit_yolo.yaml
+model: yolov8n.pt
+epochs: 100
+imgsz: 640
+batch: 16
+seed: 42
+project: experiments/phase9v_staging_chipped
+name: yolov8n_staging_chipped_phase9v
+training_dataset_scope: staging_dataset_copy_only
+original_dataset_allowed: false
+dataset_mutation_allowed: false
+xai_role: support_signal_only_not_ground_truth
+xai_used_as_ground_truth: false
+training_executed_by_phase9v: false
+evaluation_executed_by_phase9v: false
+inference_executed_by_phase9v: false

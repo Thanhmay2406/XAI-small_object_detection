@@ -492,3 +492,12 @@ Risks / open questions:
 - Fixed two conservative validator issues: explicit negative wording like `original dataset labels must not be mutated` no longer counts as authorization, and template-comparison logic no longer compares the filled approval file against itself.
 - Added `docs/phase11e_1_real_approval_validator_logic_patch.md` and a new review bundle under `artifacts/phase11e_1_real_approval_validator_logic_patch/`.
 - Expected validator result after patch: `phase11e_real_human_training_approval_validated`
+
+## 2026-06-27 - Phase 11G.0 Kaggle staging input preflight package preparation
+
+- Scope: prepare-only Kaggle staging-input and preflight package for the approved Phase 11G training path.
+- Added `scripts/prepare_phase11g_0_kaggle_staging_input_preflight_package.py` to validate the upstream Phase 11F and Phase 11F.1 gate states, inspect the Phase 9S staging dataset copy, detect the local absolute-path YAML issue, and emit a non-execution Kaggle preflight package.
+- Added `docs/phase11g_0_kaggle_staging_input_preflight_package.md` and a new package bundle under `artifacts/phase11g_0_kaggle_staging_input_preflight_package/`.
+- Confirmed that Phase 11G must not use the original `data/` dataset tree and must instead use `artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_copy`.
+- Kept the phase non-executing and non-mutating: no training, evaluation, or inference ran; the dataset was not mutated; and the package only prepares Kaggle-side preflight materials.
+- Next step: upload `staging_dataset_copy` to a Kaggle Dataset and run Kaggle preflight before any real Phase 11G training.

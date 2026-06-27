@@ -1,0 +1,6 @@
+check_id,status,evidence,notes
+phase11f_status_and_non_execution,pass,phase11f_approved_staging_training_execution_package_prepared,Phase 11F status and no-training guardrail satisfied.
+phase11f_1_status_and_next_step,pass,phase11f_1_kaggle_execution_adapter_package_prepared,"Phase 11F.1 status, next step, and no-training guardrail satisfied."
+staging_dataset_layout,pass,artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_copy,All required images/* and labels/* split directories exist.
+local_yaml_absolute_path_detection,warn,artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_drill_bit_yolo.yaml,Local staging YAML contains a /home/thanhmay absolute path and must be rewritten on Kaggle.
+phase11g_0_execution_boundary,pass,11G.0,"Phase 11G.0 prepares and checks inputs only. Training, evaluation, and inference remain unexecuted."

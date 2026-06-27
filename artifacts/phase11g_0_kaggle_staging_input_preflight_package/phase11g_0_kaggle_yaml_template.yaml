@@ -1,0 +1,11 @@
+path: /kaggle/input/REPLACE_WITH_STAGING_DATASET_SLUG/staging_dataset_copy
+train: images/train
+val: images/valid
+test: images/test
+nc: 5
+names:
+  0: Broken
+  1: Chipped
+  2: Scratched
+  3: Severe_Rust
+  4: Tip_Wear
