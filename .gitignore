@@ -3,9 +3,12 @@ __pycache__/
 *.py[cod]
 
 data/
+datasets/
 artifacts/
 experiments/
 runs/
+wandb/
+mlruns/
 notebooks/
 paper/
 tests/
@@ -14,6 +17,18 @@ tests/
 *.pth
 *.onnx
 *.engine
+*.ckpt
+*.weights
 *.cache
+*.zip
+*.tar
+*.tar.gz
+*.tgz
 
 .DS_Store
+
+# --- Phase 10C safe gitignore hygiene block ---
+# Safe local/runtime/heavy/generated patterns added by Phase 10C.
+.ipynb_checkpoints/
+archives/phase10b_visual_artifacts_archive/
+# --- End Phase 10C safe gitignore hygiene block ---

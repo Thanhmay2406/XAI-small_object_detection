@@ -1,0 +1,14 @@
+check_id,check_name,result,observed_value,notes
+phase11e_summary_exists,Phase 11E summary exists,pass,artifacts/phase11e_real_approval_validation/phase11e_real_approval_validation_summary.json,Required Phase 11E summary was loaded.
+phase11e_status_validated,Phase 11E status validated,pass,phase11e_real_human_training_approval_validated,Phase 11F only proceeds from the validated Phase 11E status.
+real_human_approval_validated,Real human approval validated,pass,True,Phase 11F requires true Phase 11E approval validation.
+training_allowed_after_phase11e,Training allowed after Phase 11E,pass,True,Phase 11F requires Phase 11E to explicitly allow later approved training.
+historical_phase9z5_flags_context_only,Historical Phase 9Z.5 flags treated as context only,pass,training_allowed=False; approval_validated=False; prior_gate_blocked=True,Historical Phase 9Z.5 state is preserved for context and does not block validated Phase 11E follow-up.
+no_training_executed,No training executed,pass,false,Phase 11F prepares a package only.
+no_evaluation_executed,No evaluation executed,pass,false,Phase 11F does not evaluate anything.
+no_inference_executed,No inference executed,pass,false,Phase 11F does not run inference.
+original_dataset_not_mutated,Original dataset not mutated,pass,false,Original dataset mutation remains forbidden.
+staging_dataset_not_mutated_by_phase11f,Staging dataset not mutated by Phase 11F,pass,false,Phase 11F consumes staging references only and does not edit them.
+phase9z5_state_not_mutated,Phase 9Z.5 state not mutated,pass,False,Phase 11F preserves historical Phase 9Z.5 state.
+approved_config_path_frozen,Approved config path frozen,pass,configs/train/phase9v_staging_chipped_yolov8n.yaml,Phase 11F records the config path to be used later in Phase 11G.
+staging_input_frozen,Approved staging input frozen,pass,dataset_copy=artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_copy; staging_yaml=artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_drill_bit_yolo.yaml,Phase 11F records the staging-only dataset input for later execution.

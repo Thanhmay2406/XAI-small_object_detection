@@ -464,3 +464,31 @@ Risks / open questions:
 - replacing `manual_review_filled.csv` should be done only after the real template is actually reviewed
 - the highest-priority buckets remain `localization_misaligned_evidence` and `near_threshold_high_evidence`
 - Phase 9 is still blocked until real review validation passes and downstream summaries are regenerated
+
+## 2026-06-27
+
+### Phase 11F.1 - Kaggle execution adapter package preparation
+
+- Scope: prepare-only Kaggle adapter phase built from the already prepared Phase 11F execution package.
+- Added `scripts/prepare_phase11f_1_kaggle_execution_adapter_package.py` to confirm the Phase 11F gate state, read the prepared Phase 11F command, and generate a Kaggle-safe parameterized command package without changing approved training semantics.
+- Added `docs/phase11f_1_kaggle_execution_adapter_package.md` and a new adapter bundle under `artifacts/phase11f_1_kaggle_execution_adapter_package/`.
+- Kept the phase non-executing and non-mutating: no training, evaluation, or inference ran; no dataset was mutated; and the Phase 11F summary was treated as read-only input.
+- Preserved the core training parameters from Phase 11F while replacing local absolute paths with Kaggle-oriented variables.
+- Next step: `phase11g_execute_approved_staging_training_on_kaggle`
+
+### Phase 11F - Approved staging training execution package preparation
+
+- Scope: prepare-only execution-package phase after Phase 11E real approval validation.
+- Added `scripts/prepare_phase11f_approved_staging_training_execution_package.py` to validate the Phase 11E pass state, freeze the approved staging-training inputs and command, and emit a non-execution package for later use.
+- Added `docs/phase11f_approved_staging_training_execution_package.md` and a new package bundle under `artifacts/phase11f_approved_staging_training_execution_package/`.
+- Kept the phase non-executing and non-mutating: training, evaluation, and inference were not executed; original and staging datasets were not mutated; and historical Phase 9Z.5 state remained unchanged.
+- Phase 11E validated the real approval path, so the execution package is now prepared for later approved use.
+- Next step: `phase11g_execute_approved_staging_training`
+
+### Phase 11E.1 - Real approval validator logic review and conservative patch
+
+- Scope: logic-review-only patch for the Phase 11E-real approval validator.
+- Patched `scripts/validate_phase11e_real_human_training_approval.py` so historical Phase 9Z.5 blocked state is preserved as context rather than treated as an automatic rejection of newly valid approval content.
+- Fixed two conservative validator issues: explicit negative wording like `original dataset labels must not be mutated` no longer counts as authorization, and template-comparison logic no longer compares the filled approval file against itself.
+- Added `docs/phase11e_1_real_approval_validator_logic_patch.md` and a new review bundle under `artifacts/phase11e_1_real_approval_validator_logic_patch/`.
+- Expected validator result after patch: `phase11e_real_human_training_approval_validated`

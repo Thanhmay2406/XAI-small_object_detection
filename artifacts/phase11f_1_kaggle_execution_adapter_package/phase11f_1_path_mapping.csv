@@ -1,0 +1,4 @@
+local_path,kaggle_path_or_variable,mapping_role,notes
+/home/thanhmay/workspace/XAI-small_object_detection,${REPO_ROOT},repo_root,Parameterize the local repo root for Kaggle working directory use.
+/home/thanhmay/workspace/XAI-small_object_detection/artifacts/phase9s_staging_dataset_relabel_patch_chipped/staging_dataset_drill_bit_yolo.yaml,${DATA_YAML},staging_data_yaml,Use the Kaggle-side staging dataset YAML while preserving staging-only semantics.
+experiments/phase9y_staging_training_chipped,${PROJECT_DIR},project_dir,Parameterize experiment output under /kaggle/working.
