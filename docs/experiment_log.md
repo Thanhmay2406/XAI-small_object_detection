@@ -163,6 +163,14 @@ Risks / open questions:
 
 ## 2026-06-28
 
+### Phase 11J.0 - Approved Kaggle training command lock
+
+- Scope: strict non-execution command-lock and handoff-record phase after a passed Phase 11I human training approval gate.
+- Added `scripts/prepare_phase11j0_approved_kaggle_training_command_lock.py` to validate a passed Phase 11I gate plus the real approval CSV and lock the exact approved Kaggle training command without modifying it.
+- Added `docs/phase11j0_approved_kaggle_training_command_lock.md`.
+- Phase 11J.0 is defined to keep training, evaluation, inference, dataset mutation, Kaggle upload, and weights/checkpoint creation all at `false`.
+- Expected next step after a valid command lock: `phase11j1_execute_locked_kaggle_training`
+
 ### Phase 11I - Human training execution approval gate
 
 - Scope: strict gate-only and record-only human approval phase after the Phase 11H Kaggle manual preflight pass.
