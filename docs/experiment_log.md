@@ -163,6 +163,30 @@ Risks / open questions:
 
 ## 2026-06-28
 
+### Phase 11R.1 - Filled checkpoint publication decision validation
+
+- Scope: strict validation-only follow-up to Phase 11R using the human-filled publication decision CSV already emitted by the metadata-only gate.
+- Added `scripts/validate_phase11r1_checkpoint_publication_decision.py` to read the Phase 11R summary, checkpoint inventory, and decision template, then validate the filled decision by content.
+- Added `docs/phase11r1_checkpoint_publication_decision_validation.md`.
+- Added a new artifact bundle under `artifacts/phase11r1_checkpoint_publication_decision_validation/`.
+- Phase 11R.1 does not load checkpoints with `torch`, `ultralytics`, or any model library.
+- Phase 11R.1 does not copy or upload checkpoints and does not execute publication.
+- Phase 11R.1 does not run training, evaluation, inference, prediction, or export.
+- Phase 11R.1 does not mutate datasets, labels, YAMLs, or other approval-state inputs.
+- Blocking conditions include `pending_manual_decision`, empty reviewer identity, empty publication target, and missing metric caveat acknowledgment.
+- If the human decision is `approve_publication_package_preparation`, Phase 11R.1 allows only the next package-preparation phase and still keeps `checkpoint_upload_executed = false`.
+
+### Phase 11R - Checkpoint publication decision gate
+
+- Scope: metadata-only decision gate for whether and how the Phase 11 training checkpoint should be published.
+- Added `scripts/prepare_phase11r_checkpoint_publication_decision_gate.py` to inventory likely checkpoint files by metadata only, emit a publication decision template, and carry forward the Phase 11P report/caveat status without performing any upload.
+- Added `docs/phase11r_checkpoint_publication_decision_gate.md`.
+- Added a new artifact bundle under `artifacts/phase11r_checkpoint_publication_decision_gate/`.
+- Phase 11R does not load checkpoints, does not copy checkpoints into artifacts, and does not upload to GitHub, Git LFS, GitHub Releases, Kaggle, or external storage.
+- Phase 11R does not run training, evaluation, inference, prediction, or export.
+- Default outcome without a filled decision CSV is `status = phase11r_checkpoint_publication_decision_pending`.
+- Default next allowed step is `fill_phase11r_publication_decision_template_then_rerun_phase11r`.
+
 ### Phase 11Q - Scoped git commit and repository handoff audit for Phase 11N-11P
 
 - Scope: read-only git handoff audit before any scoped `git add` / `git commit` / `git push`.
@@ -1069,6 +1093,43 @@ Guardrails preserved:
 - no architecture changes were made
 - no loss changes were made
 - training remained locked
+
+## 2026-06-28 - Phase 11S local checkpoint publication package
+
+Files modified:
+
+- `scripts/prepare_phase11s_local_checkpoint_publication_package.py`
+- `docs/phase11s_local_checkpoint_publication_package.md`
+- `docs/experiment_log.md`
+
+Commands run:
+
+- `python -m compileall src scripts`
+- `python scripts/prepare_phase11s_local_checkpoint_publication_package.py`
+
+Run summary:
+
+- prepared a local checkpoint publication package bundle from the validated Phase 11R.1 decision
+- `status = phase11s_local_checkpoint_publication_package_prepared_metadata_only`
+- `phase11r1_validated = true`
+- `checkpoint_package_preparation_allowed = true`
+- `checkpoint_publication_allowed = false`
+- `checkpoint_upload_executed = false`
+- `checkpoint_load_executed = false`
+- `checkpoint_binary_copied = false`
+- `checksum_generated = true`
+- `model_card_draft_created = true`
+- `release_manifest_created = true`
+- `next_allowed_step = phase11t_manual_checkpoint_publication_execution_gate_or_hold`
+
+Guardrails preserved:
+
+- no checkpoint upload was run
+- no checkpoint load with model libraries was performed
+- no training was run
+- no evaluation was run
+- no inference was run
+- no dataset mutation was performed
 
 ## 2026-06-27 - Phase 11G.4 real Kaggle mounted YAML path correction preflight package
 
