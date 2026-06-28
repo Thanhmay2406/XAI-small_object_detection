@@ -1,0 +1,14 @@
+{
+  "training_executed": false,
+  "evaluation_executed": false,
+  "inference_executed": false,
+  "prediction_executed": false,
+  "export_executed": false,
+  "dataset_mutated": false,
+  "labels_mutated": false,
+  "weights_modified": false,
+  "weights_copied_to_artifacts": false,
+  "checkpoint_loaded": false,
+  "ultralytics_python_api_imported": false,
+  "subprocess_eval_command_executed": false
+}

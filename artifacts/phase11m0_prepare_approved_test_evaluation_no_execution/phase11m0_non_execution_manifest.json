@@ -1,0 +1,16 @@
+{
+  "training_executed": false,
+  "evaluation_executed": false,
+  "inference_executed": false,
+  "prediction_executed": false,
+  "export_executed": false,
+  "dataset_mutated": false,
+  "labels_mutated": false,
+  "weights_modified": false,
+  "weights_copied_to_artifacts": false,
+  "checkpoint_loaded": false,
+  "ultralytics_training_imported": false,
+  "ultralytics_eval_imported": false,
+  "subprocess_eval_command_executed": false,
+  "phase11m_test_eval_outputs_created": false
+}

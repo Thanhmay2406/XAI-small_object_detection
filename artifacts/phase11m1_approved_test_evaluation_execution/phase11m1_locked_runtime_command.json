@@ -1,0 +1,25 @@
+{
+  "phase": "11M.1",
+  "command": "yolo detect val model=/home/thanhmay/workspace/XAI-small_object_detection/phase11j_training/yolov8n_drill_bit_phase11j/weights/best.pt data=/kaggle/input/datasets/thanhmay2406/phase11-staging-dataset-relabel-patch-chipped/staging_dataset_copy/staging_dataset_drill_bit_yolo.yaml split=test imgsz=640 batch=16 project=/home/thanhmay/workspace/XAI-small_object_detection/phase11m_test_eval name=yolov8n_drill_bit_phase11m_test_eval save_json=True save_conf=True plots=True",
+  "command_tokens": [
+    "yolo",
+    "detect",
+    "val",
+    "model=/home/thanhmay/workspace/XAI-small_object_detection/phase11j_training/yolov8n_drill_bit_phase11j/weights/best.pt",
+    "data=/kaggle/input/datasets/thanhmay2406/phase11-staging-dataset-relabel-patch-chipped/staging_dataset_copy/staging_dataset_drill_bit_yolo.yaml",
+    "split=test",
+    "imgsz=640",
+    "batch=16",
+    "project=/home/thanhmay/workspace/XAI-small_object_detection/phase11m_test_eval",
+    "name=yolov8n_drill_bit_phase11m_test_eval",
+    "save_json=True",
+    "save_conf=True",
+    "plots=True"
+  ],
+  "commented_command": "# yolo detect val model=/home/thanhmay/workspace/XAI-small_object_detection/phase11j_training/yolov8n_drill_bit_phase11j/weights/best.pt data=/kaggle/input/datasets/thanhmay2406/phase11-staging-dataset-relabel-patch-chipped/staging_dataset_copy/staging_dataset_drill_bit_yolo.yaml split=test imgsz=640 batch=16 project=/home/thanhmay/workspace/XAI-small_object_detection/phase11m_test_eval name=yolov8n_drill_bit_phase11m_test_eval save_json=True save_conf=True plots=True",
+  "execution_requested": false,
+  "approval_csv_used": false,
+  "approval_passed": false,
+  "execution_allowed": false,
+  "executed": false
+}

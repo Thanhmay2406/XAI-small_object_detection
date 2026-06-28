@@ -1,0 +1,13 @@
+{
+  "training_executed": false,
+  "evaluation_executed": false,
+  "inference_executed": false,
+  "prediction_executed": false,
+  "export_executed": false,
+  "dataset_mutated": false,
+  "labels_mutated": false,
+  "weights_modified": false,
+  "weights_copied_to_artifacts": false,
+  "ultralytics_training_imported": false,
+  "checkpoint_tensor_loaded": false
+}

@@ -163,6 +163,51 @@ Risks / open questions:
 
 ## 2026-06-28
 
+### Phase 11M.1 - Explicit approved test evaluation execution wrapper
+
+- Scope: explicit execution wrapper for the Phase 11M.0 locked test evaluation package.
+- Added `scripts/execute_phase11m1_approved_test_evaluation.py` to validate the Phase 11M.0 package, support Kaggle GPU runtime path overrides, prepare the exact runtime `yolo detect val` command, and execute it only when explicitly allowed.
+- Added `docs/phase11m1_approved_test_evaluation_execution.md`.
+- Phase 11M.1 is blocked by default and carries forward the existing Phase 11J.1 / Phase 11K / Phase 11L provenance caveat.
+- Phase 11M.1 does not train, mutate datasets, mutate labels, copy or modify weights, or load checkpoint tensors directly in Python.
+- Local verification was run only in default non-execution mode, so evaluation was not executed.
+- Resulting status: `phase11m1_test_evaluation_blocked_missing_execute_or_approval`.
+- Next allowed step: `provide_explicit_execute_flag_or_filled_phase11m1_approval_csv`.
+
+### Phase 11M.0 - Prepare-only approved test evaluation package
+
+- Scope: strict prepare-only and non-execution phase after the passed Phase 11L checkpoint integrity gate.
+- Added `scripts/prepare_phase11m0_approved_test_evaluation_no_execution.py` to validate the Phase 11L summary, verify the accepted `best.pt` by metadata only, resolve the dataset YAML path conservatively, and prepare a locked `yolo detect val` command without executing it.
+- Added `docs/phase11m0_prepare_approved_test_evaluation_no_execution.md`.
+- Phase 11M.0 created the evaluation approval template for Phase 11M.1 and carried forward the existing Phase 11J.1 / Phase 11K / Phase 11L provenance caveat.
+- Phase 11M.0 did not run evaluation, inference, prediction, training, export, dataset mutation, label mutation, checkpoint loading, or weight copying.
+- Resulting status: `phase11m0_approved_test_evaluation_prepare_only_passed`.
+- Next allowed step: `collect_phase11m1_explicit_evaluation_execution_approval_or_execute_with_flag`.
+
+### Phase 11L - Training output integrity and provenance validation
+
+- Scope: strict non-execution validation phase for the Phase 11K collected training outputs.
+- Added `scripts/validate_phase11l_training_output_integrity_and_provenance.py` to validate the Phase 11K artifacts, re-parse the local `results.csv`, compare direct metrics against the Phase 11K summary, and re-check checkpoint metadata by path, size, mtime, and streamed `sha256` only.
+- Added `docs/phase11l_training_output_integrity_and_provenance.md`.
+- Phase 11L records the existing provenance caveat that the repo-local Phase 11J.1 summary still reports `phase11j1_execution_not_started_missing_execute_flag`, so this phase validates only local output integrity and not Kaggle execution provenance.
+- Phase 11L does not train, evaluate, infer, mutate datasets, load checkpoint tensors, or copy weights into artifacts.
+- Resulting status: `phase11l_training_output_integrity_and_provenance_passed`.
+- Next allowed step: `phase11m0_prepare_approved_test_evaluation_no_execution`.
+
+### Phase 11K - Training outputs and metrics collection
+
+- Scope: strict non-execution output-collection and provenance-materialization phase after a completed Kaggle Phase 11J.1 run was copied back locally.
+- Added `scripts/collect_phase11k_training_outputs_and_metrics.py` to inspect the existing local YOLO run directory, hash the existing `best.pt` and `last.pt` files by streamed `sha256`, parse `results.csv`, and emit only small metadata artifacts.
+- Added `docs/phase11k_training_outputs_and_metrics.md`.
+- Inspected local training output directory: `phase11j_training/yolov8n_drill_bit_phase11j`.
+- Found `results.csv`, `weights/best.pt`, `weights/last.pt`, and `args.yaml`.
+- Because the repo-local Phase 11J.1 summary still shows the earlier dry-run state, Phase 11K conservatively recorded `phase11j1_summary_available = false` and relied on direct local output inspection instead of claiming success from that summary.
+- Parsed 100 `results.csv` rows.
+- Best tracked metric used `metrics/mAP50-95(B)` and selected epoch 42 with `0.36688`.
+- Final epoch 100 metrics included `metrics/mAP50-95(B) = 0.35709` and `metrics/mAP50(B) = 0.71681`.
+- No training, evaluation, inference, dataset mutation, Kaggle upload, or weight creation/copying occurred in Phase 11K.
+- Next step: `phase11l_evaluate_trained_model_on_approved_test_split`
+
 ### Phase 11J.1 - Locked Kaggle training execution wrapper
 
 - Scope: controlled execution-wrapper phase for the exact Phase 11J.0 locked Kaggle command.
