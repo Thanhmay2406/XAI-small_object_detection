@@ -1,0 +1,6 @@
+check_id,passed,expected,observed,notes
+approval_csv_exists,true,existing approval csv,/home/thanhmay/workspace/XAI-small_object_detection/artifacts/phase11i_human_training_execution_approval_gate/phase11i_training_execution_approval_filled.csv,Phase 11J.0 requires a concrete approval CSV provenance source.
+single_approval_row,true,exactly one row,1,Phase 11J.0 locks one explicit approved command only.
+approved_for_training_execution,true,true,true,The approval row must explicitly authorize training execution.
+training_command_locked_exactly,true,exact command from approval csv,yolo detect train model=yolov8n.pt data=/kaggle/input/datasets/thanhmay2406/phase11-staging-dataset-relabel-patch-chipped/staging_dataset_copy/staging_dataset_drill_bit_yolo.yaml epochs=100 imgsz=640 batch=16 device=0 project=/kaggle/working/phase11j_training name=yolov8n_drill_bit_phase11j seed=42,Phase 11J.0 stores the approved command exactly as provided.
+expected_output_dir_locked_exactly,true,exact expected output dir from approval csv,/kaggle/working/phase11j_training,Phase 11J.0 stores the expected output directory exactly as approved.
