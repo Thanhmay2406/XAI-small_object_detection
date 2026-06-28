@@ -1,0 +1,12 @@
+artifact_name,expected,present,path,size_bytes,required_for_phase11n_pass,notes
+args.yaml,True,False,,0,False,Optional. Validation output directories may omit args.yaml.
+predictions.json,True,True,/home/thanhmay/workspace/XAI-small_object_detection/experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval/predictions.json,7029583,True,Strong evaluation artifact; records prediction outputs but not aggregate metrics by itself.
+confusion_matrix.png,True,True,/home/thanhmay/workspace/XAI-small_object_detection/experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval/confusion_matrix.png,166352,False,Strong evaluation artifact for class-level validation behavior.
+confusion_matrix_normalized.png,True,True,/home/thanhmay/workspace/XAI-small_object_detection/experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval/confusion_matrix_normalized.png,191335,False,Optional normalized confusion matrix.
+F1_curve.png,True,True,/home/thanhmay/workspace/XAI-small_object_detection/experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval/BoxF1_curve.png,265056,False,Optional evaluation plot.
+P_curve.png,True,True,/home/thanhmay/workspace/XAI-small_object_detection/experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval/BoxP_curve.png,243983,False,Optional evaluation plot.
+R_curve.png,True,True,/home/thanhmay/workspace/XAI-small_object_detection/experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval/BoxR_curve.png,239848,False,Optional evaluation plot.
+PR_curve.png,True,True,/home/thanhmay/workspace/XAI-small_object_detection/experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval/BoxPR_curve.png,213691,False,Optional evaluation plot.
+results.csv,True,False,,0,False,"Useful for metrics, but not always emitted for pure validation runs."
+results.json,True,False,,0,False,Useful for metrics if emitted by the runtime.
+val_batch_images,True,True,/home/thanhmay/workspace/XAI-small_object_detection/experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval,2224061,True,Validation batch preview images are a strong sign that Ultralytics validation completed.

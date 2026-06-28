@@ -1,0 +1,7 @@
+check_name,passed,severity,observed_value,expected_value,notes
+eval_dir_exists,True,error,True,True,Evaluation output directory must exist.
+eval_dir_non_empty,True,error,13,> 0,Evaluation output directory must contain files.
+training_dir_exists,True,info,True,True,Training output directory is optional but should exist for provenance linkage.
+credible_evaluation_artifacts_found,True,error,"{""predictions_json_available"": true, ""confusion_matrix_available"": true, ""confusion_matrix_normalized_available"": true, ""validation_batch_images_count"": 6, ""curve_count"": 4}",at least one strong evaluation artifact family present,Phase 11N requires credible output artifacts even if direct metrics are absent.
+metrics_summary_available,False,info,,"results.json, results.csv, or stdout metrics",Metrics may legitimately require manual review if Ultralytics did not emit machine-readable summaries.
+args_yaml_mentions_split_test,False,info,False,True,This is informative only because args.yaml may be absent from validation output directories.

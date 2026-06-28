@@ -163,6 +163,55 @@ Risks / open questions:
 
 ## 2026-06-28
 
+### Phase 11Q - Scoped git commit and repository handoff audit for Phase 11N-11P
+
+- Scope: read-only git handoff audit before any scoped `git add` / `git commit` / `git push`.
+- Added `scripts/audit_phase11q_scoped_git_handoff.py` to inspect `git status --short`, classify exact Phase 11N-11P candidates, separate out-of-scope dirty files, detect blocked large/binary/runtime outputs, and prepare command previews without executing them.
+- Added `docs/phase11q_scoped_git_handoff_audit.md`.
+- Added a new artifact bundle under `artifacts/phase11q_scoped_git_handoff_audit/`.
+- Phase 11Q does not run `git add`, `git commit`, or `git push`.
+- Phase 11Q does not run training, evaluation, inference, prediction, or export.
+- Phase 11Q does not load checkpoints, mutate datasets, mutate labels, or copy large outputs into artifacts.
+- The purpose of this phase is only to prepare a safe scoped handoff manifest and preview commands for later manual review.
+
+### Phase 11P - Final test evaluation evidence report with metric provenance caveat
+
+- Scope: strict report-only consolidation phase for Phase 11J through Phase 11O.
+- Added `scripts/prepare_phase11p_final_test_evaluation_report.py` to read the Phase 11N and Phase 11O summaries, prepare a final markdown report, and emit a metric provenance table without recomputing metrics.
+- Added `docs/phase11p_final_test_evaluation_report_with_caveat.md`.
+- Added a new artifact bundle under `artifacts/phase11p_final_test_evaluation_report/`.
+- Phase 11P explicitly does not run training, evaluation, inference, prediction, or export.
+- Phase 11P does not load checkpoints, does not parse `predictions.json` for metric recomputation, and does not copy large outputs into artifacts.
+- If Phase 11O reporting remains blocked, Phase 11P prepares a caveated final report that does not claim numeric aggregate test metrics.
+- If Phase 11O later unlocks reporting, Phase 11P may include manually validated test metrics with explicit manual-provenance caveat.
+
+### Phase 11O - Manual test metric review gate
+
+- Scope: strict review-only manual metric provenance gate after Phase 11N flagged that credible test evaluation outputs exist but aggregate test metrics still require manual extraction.
+- Added `scripts/validate_phase11o_manual_test_metric_review.py` to read the Phase 11N summary, emit a manual review template, validate exactly one manually entered review row, and gate later reporting without recomputing metrics.
+- Added `docs/phase11o_manual_test_metric_review_gate.md`.
+- Added a new artifact bundle under `artifacts/phase11o_manual_test_metric_review/`.
+- Phase 11O explicitly does not run training, evaluation, inference, prediction, or export.
+- Phase 11O does not mutate datasets, YAML files, labels, or images.
+- Phase 11O does not load checkpoints, parse `predictions.json` to recompute metrics, or copy large runtime outputs into artifacts.
+- Default outcome without a valid filled review CSV is `status = phase11o_manual_test_metric_review_pending`.
+- Default next allowed step is `fill_phase11o_manual_metric_review_csv_from_kaggle_visible_output_then_rerun_phase11o`.
+
+### Phase 11N - Test evaluation output collection and validation
+
+- Scope: strict non-execution collector/validator for existing Phase 11M.1 test evaluation outputs.
+- Added `scripts/collect_phase11n_test_evaluation_outputs.py` to inspect and validate the existing evaluation output directory and the related training output directory without executing anything.
+- Added `docs/phase11n_test_evaluation_output_collection_and_validation.md`.
+- Phase 11N inspects:
+  - `experiments/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval`
+  - `experiments/phase11j_training`
+- Phase 11N does not run evaluation, inference, prediction, training, or export.
+- Phase 11N does not mutate datasets or labels.
+- Phase 11N does not load, copy, or modify checkpoint weights.
+- Phase 11N does not copy large evaluation outputs into artifacts.
+- Resulting status: `phase11n_test_evaluation_outputs_collected_needs_manual_metric_review`.
+- Next allowed step: `manually_extract_phase11m1_metrics_then_rerun_phase11n_or_continue_with_caveat`.
+
 ### Phase 11M.1 - Explicit approved test evaluation execution wrapper
 
 - Scope: explicit execution wrapper for the Phase 11M.0 locked test evaluation package.
@@ -173,6 +222,13 @@ Risks / open questions:
 - Local verification was run only in default non-execution mode, so evaluation was not executed.
 - Resulting status: `phase11m1_test_evaluation_blocked_missing_execute_or_approval`.
 - Next allowed step: `provide_explicit_execute_flag_or_filled_phase11m1_approval_csv`.
+
+### Phase 11 Runtime Output Relocation
+
+- Moved the local Phase 11 training and evaluation runtime output roots out of the repo top level and under `experiments/` to keep source/docs and runtime outputs separated more cleanly.
+- Updated the Phase 11K default training-output inspection path to `experiments/phase11j_training/yolov8n_drill_bit_phase11j`.
+- Updated the Phase 11M.0 and Phase 11M.1 repo-local evaluation project path to `experiments/phase11m_test_eval`.
+- This relocation is organizational only and does not run training, evaluation, inference, dataset mutation, or checkpoint modification.
 
 ### Phase 11M.0 - Prepare-only approved test evaluation package
 
