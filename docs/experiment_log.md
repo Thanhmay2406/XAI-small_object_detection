@@ -163,6 +163,15 @@ Risks / open questions:
 
 ## 2026-06-28
 
+### Phase 11J.1 - Locked Kaggle training execution wrapper
+
+- Scope: controlled execution-wrapper phase for the exact Phase 11J.0 locked Kaggle command.
+- Added `scripts/execute_phase11j1_locked_kaggle_training.py` to validate the Phase 11J.0 lock, stay in local dry-run mode by default, and execute only with `--execute` in a Kaggle runtime.
+- Added `docs/phase11j1_locked_kaggle_training_execution.md`.
+- Local verification remains non-executing and should produce `status = phase11j1_execution_not_started_missing_execute_flag`.
+- Actual Kaggle execution is separate from local preparation and should only occur when `--execute` is supplied on Kaggle.
+- Weights creation remains `false` in local dry-run preparation and becomes runtime-dependent only after real Kaggle execution.
+
 ### Phase 11J.0 - Approved Kaggle training command lock
 
 - Scope: strict non-execution command-lock and handoff-record phase after a passed Phase 11I human training approval gate.
