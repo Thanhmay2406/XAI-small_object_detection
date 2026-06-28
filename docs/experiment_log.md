@@ -1094,6 +1094,45 @@ Guardrails preserved:
 - no loss changes were made
 - training remained locked
 
+## 2026-06-28 - Phase 11T manual checkpoint publication execution gate
+
+Files modified:
+
+- `scripts/validate_phase11t_manual_checkpoint_publication_execution_gate.py`
+- `docs/phase11t_manual_checkpoint_publication_execution_gate.md`
+- `docs/experiment_log.md`
+
+Commands run:
+
+- `python -m compileall src scripts`
+- `python scripts/validate_phase11t_manual_checkpoint_publication_execution_gate.py`
+
+Run summary:
+
+- created a manual publication execution decision template and audited the Phase 11S handoff without executing publication
+- `status = phase11t_blocked_waiting_human_checkpoint_publication_execution_decision`
+- `phase11s_validated = true`
+- `publication_execution_allowed = false`
+- `checkpoint_upload_allowed = false`
+- `checkpoint_load_allowed = false`
+- `checkpoint_binary_publication_allowed = false`
+- `checkpoint_publication_allowed = false`
+- `checkpoint_upload_executed = false`
+- `checkpoint_load_executed = false`
+- `checkpoint_binary_copied = false`
+- `next_allowed_step = fill_phase11t_manual_decision_or_hold`
+
+Guardrails preserved:
+
+- no checkpoint upload was run
+- no remote publication was run
+- no checkpoint model load was performed
+- no checkpoint binary copy was performed
+- no training was run
+- no evaluation was run
+- no inference was run
+- no dataset mutation was performed
+
 ## 2026-06-28 - Phase 11S local checkpoint publication package
 
 Files modified:
