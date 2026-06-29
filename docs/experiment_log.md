@@ -1133,6 +1133,52 @@ Guardrails preserved:
 - no inference was run
 - no dataset mutation was performed
 
+## 2026-06-29 - Phase 11T adapter-preparation checkpoint publication decision path
+
+Files modified:
+
+- `scripts/validate_phase11t_manual_checkpoint_publication_execution_gate.py`
+- `artifacts/phase11t_manual_checkpoint_publication_execution_gate/phase11t_publication_execution_decision_template.csv`
+- `artifacts/phase11t_manual_checkpoint_publication_execution_gate/phase11t_publication_execution_decision_filled.csv`
+- `docs/phase11t_manual_checkpoint_publication_execution_gate.md`
+- `docs/experiment_log.md`
+
+Commands run:
+
+- `python -m compileall src scripts`
+- `python scripts/validate_phase11t_manual_checkpoint_publication_execution_gate.py --decision-csv artifacts/phase11t_manual_checkpoint_publication_execution_gate/phase11t_publication_execution_decision_filled.csv`
+
+Run summary:
+
+- added `approve_manual_checkpoint_publication_adapter_preparation` as a separate conservative Phase 11T decision
+- preserved `approve_manual_checkpoint_publication_execution` as the stronger existing approval path
+- validated the filled preparation-only decision CSV for a Phase 11U manual adapter handoff
+- `status = phase11t_checkpoint_publication_adapter_preparation_approved`
+- `publication_execution_allowed = true`
+- `checkpoint_upload_allowed = false`
+- `checkpoint_binary_publication_allowed = false`
+- `checkpoint_load_allowed = false`
+- `checkpoint_publication_allowed = false`
+- `checkpoint_upload_executed = false`
+- `checkpoint_load_executed = false`
+- `checkpoint_binary_copied = false`
+- `training_executed = false`
+- `evaluation_executed = false`
+- `inference_executed = false`
+- `dataset_mutation_executed = false`
+- `next_allowed_step = phase11u_prepare_manual_publication_execution_adapter_or_hold`
+
+Guardrails preserved:
+
+- no checkpoint upload was run
+- no remote publication was run
+- no checkpoint model load was performed
+- no checkpoint binary copy was performed
+- no training was run
+- no evaluation was run
+- no inference was run
+- no dataset mutation was performed
+
 ## 2026-06-28 - Phase 11S local checkpoint publication package
 
 Files modified:

@@ -27,6 +27,7 @@ CHECKS_NAME = "phase11t_publication_execution_checks.csv"
 MANIFEST_NAME = "phase11t_non_execution_manifest.json"
 README_NAME = "README.md"
 STATUS_WAITING = "phase11t_blocked_waiting_human_checkpoint_publication_execution_decision"
+STATUS_ADAPTER_PREPARATION_APPROVED = "phase11t_checkpoint_publication_adapter_preparation_approved"
 STATUS_APPROVED = "phase11t_checkpoint_publication_execution_gate_approved"
 STATUS_INVALID = "phase11t_blocked_invalid_checkpoint_publication_execution_decision"
 NEXT_WAITING = "fill_phase11t_manual_decision_or_hold"
@@ -296,7 +297,9 @@ def build_decision_template_row() -> dict[str, str]:
         "publication_target": "",
         "notes": (
             "Fill manually after real human review. Phase 11T is a gate only; "
-            "it must not upload, publish, load, or execute the checkpoint."
+            "valid decisions are approve_manual_checkpoint_publication_adapter_preparation, "
+            "approve_manual_checkpoint_publication_execution, hold, reject, or pending_manual_decision. "
+            "Phase 11T itself must not upload, publish, load, or execute the checkpoint."
         ),
     }
 
@@ -455,6 +458,7 @@ def validate_filled_decision(
 
     decision_value = normalized["decision"]
     decision_allowed = decision_value in {
+        "approve_manual_checkpoint_publication_adapter_preparation",
         "approve_manual_checkpoint_publication_execution",
         "hold",
         "reject",
@@ -466,7 +470,10 @@ def validate_filled_decision(
         decision_allowed,
         "error",
         decision_value,
-        "approve_manual_checkpoint_publication_execution, hold, reject, or pending_manual_decision",
+        (
+            "approve_manual_checkpoint_publication_adapter_preparation, "
+            "approve_manual_checkpoint_publication_execution, hold, reject, or pending_manual_decision"
+        ),
         "Phase 11T supports a small set of explicit human gate outcomes.",
     )
     if not decision_allowed:
@@ -580,6 +587,67 @@ def validate_filled_decision(
         if not load_ok:
             errors.append("approve_manual_checkpoint_publication_execution requires checkpoint_load_allowed=false.")
 
+    if decision_value == "approve_manual_checkpoint_publication_adapter_preparation":
+        execution_ok = normalized["publication_execution_allowed"] == "true"
+        upload_ok = normalized["checkpoint_upload_allowed"] == "false"
+        binary_ok = normalized["checkpoint_binary_publication_allowed"] == "false"
+        load_ok = normalized["checkpoint_load_allowed"] == "false"
+
+        add_check(
+            checks,
+            "adapter_preparation_publication_execution_allowed_true",
+            execution_ok,
+            "error",
+            normalized["publication_execution_allowed"],
+            "true",
+            "Preparation-only adapter approval still requires publication_execution_allowed=true.",
+        )
+        add_check(
+            checks,
+            "adapter_preparation_checkpoint_upload_allowed_false",
+            upload_ok,
+            "error",
+            normalized["checkpoint_upload_allowed"],
+            "false",
+            "Preparation-only adapter approval must not allow checkpoint upload.",
+        )
+        add_check(
+            checks,
+            "adapter_preparation_checkpoint_binary_publication_allowed_false",
+            binary_ok,
+            "error",
+            normalized["checkpoint_binary_publication_allowed"],
+            "false",
+            "Preparation-only adapter approval must not allow checkpoint binary publication.",
+        )
+        add_check(
+            checks,
+            "adapter_preparation_checkpoint_load_allowed_false",
+            load_ok,
+            "error",
+            normalized["checkpoint_load_allowed"],
+            "false",
+            "Preparation-only adapter approval must not allow checkpoint loading.",
+        )
+
+        if not execution_ok:
+            errors.append(
+                "approve_manual_checkpoint_publication_adapter_preparation requires publication_execution_allowed=true."
+            )
+        if not upload_ok:
+            errors.append(
+                "approve_manual_checkpoint_publication_adapter_preparation requires checkpoint_upload_allowed=false."
+            )
+        if not binary_ok:
+            errors.append(
+                "approve_manual_checkpoint_publication_adapter_preparation requires "
+                "checkpoint_binary_publication_allowed=false."
+            )
+        if not load_ok:
+            errors.append(
+                "approve_manual_checkpoint_publication_adapter_preparation requires checkpoint_load_allowed=false."
+            )
+
     if decision_value in {"hold", "reject"} and not notes_present:
         errors.append(f"{decision_value} decision requires notes.")
 
@@ -607,7 +675,15 @@ def build_summary(
     decision_block_reason = ""
 
     if decision_result["provided"]:
-        if decision_result["valid"] and decision_value == "approve_manual_checkpoint_publication_execution":
+        if decision_result["valid"] and decision_value == "approve_manual_checkpoint_publication_adapter_preparation":
+            publication_execution_allowed = True
+            checkpoint_upload_allowed = False
+            checkpoint_binary_publication_allowed = False
+            checkpoint_load_allowed = False
+            checkpoint_publication_allowed = False
+            status = STATUS_ADAPTER_PREPARATION_APPROVED
+            next_allowed_step = NEXT_APPROVED
+        elif decision_result["valid"] and decision_value == "approve_manual_checkpoint_publication_execution":
             publication_execution_allowed = True
             checkpoint_upload_allowed = normalized["checkpoint_upload_allowed"] == "true"
             checkpoint_binary_publication_allowed = (

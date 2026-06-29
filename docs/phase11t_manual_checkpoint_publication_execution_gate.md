@@ -47,7 +47,21 @@ Default blocked status:
 
 Approved behavior:
 
+- `status = phase11t_checkpoint_publication_adapter_preparation_approved`
+- Valid when `decision = approve_manual_checkpoint_publication_adapter_preparation`
+- Requires exactly:
+- `publication_execution_allowed = true`
+- `checkpoint_upload_allowed = false`
+- `checkpoint_binary_publication_allowed = false`
+- `checkpoint_load_allowed = false`
+- Keeps `checkpoint_publication_allowed = false`
+- Keeps all execution, load, copy, and dataset mutation booleans false
+- `next_allowed_step = phase11u_prepare_manual_publication_execution_adapter_or_hold`
+- This approves only preparation of the manual publication adapter or checklist in Phase 11U.
+
 - `status = phase11t_checkpoint_publication_execution_gate_approved`
+- Valid when `decision = approve_manual_checkpoint_publication_execution`
+- This remains the stronger approval path and is not weakened by the preparation-only adapter decision.
 - Approval still does not upload, publish, load, copy, train, evaluate, infer, or mutate data.
 - Approval only unlocks a later preparation or execution adapter phase.
 
