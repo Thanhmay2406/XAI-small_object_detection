@@ -1,9 +1,0 @@
-phase,approval_item,approved,approver,approval_timestamp,notes
-11M.1,execute_test_evaluation_with_phase11l_best_pt,false,,,Explicit approval required before any evaluation execution.
-11M.1,use_runtime_model_path,false,,,Explicit approval required before any evaluation execution.
-11M.1,use_runtime_dataset_yaml,false,,,Explicit approval required before any evaluation execution.
-11M.1,write_outputs_to_phase11m_test_eval,false,,,Explicit approval required before any evaluation execution.
-11M.1,confirm_no_training,false,,,Explicit approval required before any evaluation execution.
-11M.1,confirm_no_dataset_mutation,false,,,Explicit approval required before any evaluation execution.
-11M.1,confirm_no_label_mutation,false,,,Explicit approval required before any evaluation execution.
-11M.1,confirm_no_weight_copy_or_modification,false,,,Explicit approval required before any evaluation execution.

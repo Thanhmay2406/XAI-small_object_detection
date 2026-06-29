@@ -1,4 +1,0 @@
-field,value,locked,notes
-command,yolo detect val model=/home/thanhmay/workspace/XAI-small_object_detection/phase11j_training/yolov8n_drill_bit_phase11j/weights/best.pt data=/kaggle/input/datasets/thanhmay2406/phase11-staging-dataset-relabel-patch-chipped/staging_dataset_copy/staging_dataset_drill_bit_yolo.yaml split=test imgsz=640 batch=16 project=/home/thanhmay/workspace/XAI-small_object_detection/phase11m_test_eval name=yolov8n_drill_bit_phase11m_test_eval save_json=True save_conf=True plots=True,true,Prepared for review only; Phase 11M.0 does not execute it.
-dataset_yaml_resolution_status,resolved_kaggle_path_not_locally_available,true,Runtime expectations depend on whether the dataset path exists locally or only in Kaggle.
-evaluation_runtime_target,kaggle_or_environment_with_dataset_mounted,true,Recorded for later execution-phase routing only.

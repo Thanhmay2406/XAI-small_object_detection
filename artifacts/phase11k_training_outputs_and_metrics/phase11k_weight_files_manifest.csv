@@ -1,3 +1,0 @@
-weight_label,path,exists,size_bytes,size_mb,sha256,modified_time_utc
-best.pt,/home/thanhmay/workspace/XAI-small_object_detection/phase11j_training/yolov8n_drill_bit_phase11j/weights/best.pt,True,6257578,5.967691,d37122f78f6a4a00a9e17ebb865b67445d2cb59c5db6ec5f6dc96a34aaa5d3e5,2026-06-27T21:24:22+00:00
-last.pt,/home/thanhmay/workspace/XAI-small_object_detection/phase11j_training/yolov8n_drill_bit_phase11j/weights/last.pt,True,6257578,5.967691,6a88326fdae59ccf6ee0105f8155056b40104a8a15aca36118eef17ba4a2dc4e,2026-06-27T21:24:22+00:00

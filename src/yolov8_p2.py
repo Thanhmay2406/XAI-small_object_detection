@@ -3,6 +3,21 @@ import os
 from pathlib import Path
 from typing import Any
 
+'''
+python src/yolov8_p2.py \
+  --data your-data.yaml \
+  --model yolov8s-p2.yaml \
+  --epochs 100 \
+  --imgsz 640 \
+  --batch 16 \
+  --device 0 \
+  --workers 8 \
+  --patience 20 \
+  --project runs/train \
+  --name yolov8_p2_run \
+  --seed 42
+'''
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Train a YOLOv8 model with the P2 feature pyramid head enabled."

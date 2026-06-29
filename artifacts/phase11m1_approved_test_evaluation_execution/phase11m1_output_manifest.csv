@@ -1,2 +1,0 @@
-relative_path,exists,is_dir,size_bytes,modified_time_utc,note
-/home/thanhmay/workspace/XAI-small_object_detection/phase11m_test_eval/yolov8n_drill_bit_phase11m_test_eval,False,True,0,,Evaluation output directory not present.

@@ -1,9 +1,0 @@
-metric_name,phase11k_value,direct_value,difference,tolerance,passed,notes
-best_epoch,42.0,42.0,0.0,0.0001,True,Epoch values match directly.
-best_metric_map50_95,0.36688,0.36688,0.0,0.0001,True,Direct best mAP50-95 should match the Phase 11K summary within tolerance.
-final_epoch,100.0,100.0,0.0,0.0001,True,Epoch values match directly.
-final_metric_map50_95,0.35709,0.35709,0.0,0.0001,True,Direct final mAP50-95 should match the Phase 11K summary within tolerance.
-final_metric_map50,0.71681,0.71681,0.0,0.0001,True,Direct final mAP50 should match the Phase 11K summary within tolerance.
-best_metric_map50_95_reference,0.36688,0.36688,0.0,0.0001,True,Direct best mAP50-95 should match the known Phase 11K value.
-final_metric_map50_95_reference,0.35709,0.35709,0.0,0.0001,True,Direct final mAP50-95 should match the known Phase 11K value.
-final_metric_map50_reference,0.71681,0.71681,0.0,0.0001,True,Direct final mAP50 should match the known Phase 11K value.

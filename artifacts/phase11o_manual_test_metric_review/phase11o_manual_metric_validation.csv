@@ -1,7 +1,0 @@
-check_name,passed,severity,observed_value,expected_value,notes
-phase11n_summary_exists,true,info,/home/thanhmay/workspace/XAI-small_object_detection/artifacts/phase11n_test_evaluation_output_collection_and_validation/phase11n_test_evaluation_output_summary.json,existing Phase 11N summary JSON,Phase 11O requires the strict non-execution Phase 11N summary as input.
-phase11n_phase_matches,true,error,11N,11N,Phase 11O should only consume a Phase 11N summary.
-phase11n_status_needs_manual_metric_review,true,error,phase11n_test_evaluation_outputs_collected_needs_manual_metric_review,phase11n_test_evaluation_outputs_collected_needs_manual_metric_review,Phase 11O is the follow-up gate for manual metric review after Phase 11N.
-phase11n_eval_outputs_credible,true,error,True,True,Phase 11O assumes a credible evaluation directory already exists.
-phase11n_manual_review_required,true,error,True,True,Phase 11O should only be used when Phase 11N could not parse aggregate metrics automatically.
-manual_review_csv_provided,false,info,,path to a filled manual review CSV,"No manual review CSV was provided, so Phase 11O stays pending and emits a template."

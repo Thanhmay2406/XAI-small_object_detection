@@ -1,6 +1,0 @@
-phase,approval_item,approved,approver,approval_timestamp,notes
-11M.0,execute_test_evaluation_with_best_pt,false,,,Explicit approval required before any later execution phase.
-11M.0,use_phase11l_baseline_checkpoint_candidate,false,,,Explicit approval required before any later execution phase.
-11M.0,use_resolved_dataset_yaml,false,,,Explicit approval required before any later execution phase.
-11M.0,write_evaluation_outputs_to_phase11m_test_eval,false,,,Explicit approval required before any later execution phase.
-11M.0,confirm_no_training_or_dataset_mutation,false,,,Explicit approval required before any later execution phase.
