@@ -14,6 +14,7 @@ from typing import Any, Mapping, Sequence
 
 import torch
 import yaml
+from ultralytics.cfg import DEFAULT_CFG
 from ultralytics.models.yolo.detect.train import DetectionTrainer
 from ultralytics.nn.tasks import DetectionModel
 from ultralytics.utils import RANK
@@ -338,8 +339,11 @@ class M8V1CPolicyMiningTrainer(DetectionTrainer):
     """DetectionTrainer subclass that wires the M8_v1c runtime policy into the model."""
 
     def __init__(self, cfg=None, overrides: dict[str, Any] | None = None, _callbacks: dict | None = None):
-        super().__init__(cfg=cfg, overrides=overrides, _callbacks=_callbacks)
-        method_config = getattr(self.args, "method_config", None)
+        runtime_overrides = dict(overrides or {})
+        method_config = runtime_overrides.pop("method_config", None)
+        if cfg is None:
+            cfg = DEFAULT_CFG
+        super().__init__(cfg=cfg, overrides=runtime_overrides, _callbacks=_callbacks)
         if not method_config:
             raise ValueError("M8V1CPolicyMiningTrainer requires args.method_config.")
         self.method_config_path = Path(str(method_config)).resolve()
