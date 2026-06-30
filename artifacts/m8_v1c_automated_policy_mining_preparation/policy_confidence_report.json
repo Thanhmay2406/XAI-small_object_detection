@@ -1,0 +1,180 @@
+{
+  "phase": "M8_v1c",
+  "status": "m8_v1c_policy_candidate_prepared",
+  "generated_at_utc": "2026-06-30T12:33:17.292294+00:00",
+  "upstream_dependencies_verified": {
+    "m8_1_decision_summary": "artifacts/m8_1_size_aware_fpn_scale_selection_decision_gate/m8_1_decision_summary.json",
+    "m8_v1b_implementation_summary": "artifacts/m8_v1b_size_aware_scale_weighting_implementation/m8_v1b_implementation_summary.json",
+    "val_summary": "artifacts/m8_xai_fpn_scale_selection_val_full/m8_scale_summary.json",
+    "test_summary": "artifacts/m8_xai_fpn_scale_selection_test_full/m8_scale_summary.json"
+  },
+  "pipeline_stages": {
+    "stage_a": "baseline evidence collection from existing M8 summaries only",
+    "stage_b": "xai scale attribution already summarized upstream",
+    "stage_c": "size-wise aggregation over small, medium, and large",
+    "stage_d": "policy mining with conservative identity fallback",
+    "stage_e": "machine-readable export only",
+    "stage_f": "runtime integration not executed in this phase",
+    "stage_g": "controlled training and evaluation blocked pending approval"
+  },
+  "policy_groups": {
+    "small": {
+      "size_group": "small",
+      "val_total_objects": 465,
+      "test_total_objects": 519,
+      "combined_total_objects": 984,
+      "val_dominant_scale": "P3",
+      "test_dominant_scale": "P3",
+      "combined_counts": {
+        "P2": 25,
+        "P3": 645,
+        "P4": 157,
+        "P5": 157
+      },
+      "combined_ranked_scales": [
+        {
+          "scale": "P3",
+          "count": 645
+        },
+        {
+          "scale": "P4",
+          "count": 157
+        },
+        {
+          "scale": "P5",
+          "count": 157
+        },
+        {
+          "scale": "P2",
+          "count": 25
+        }
+      ],
+      "best_scale": "P3",
+      "second_best_scale": "P4",
+      "best_minus_second_margin": 0.4959349593495935,
+      "split_consistent": true,
+      "auto_policy_allowed": true,
+      "mode": "preferred_scale",
+      "preferred_scale": "P3",
+      "weight_delta": {
+        "P3": 1.2,
+        "P2": 1.0,
+        "P4": 0.95,
+        "P5": 0.9
+      },
+      "rationale": "small is split-consistent and the best-vs-second margin is 0.496, so P3 is auto-proposed.",
+      "fallback_reason": ""
+    },
+    "medium": {
+      "size_group": "medium",
+      "val_total_objects": 595,
+      "test_total_objects": 549,
+      "combined_total_objects": 1144,
+      "val_dominant_scale": "P5",
+      "test_dominant_scale": "P5",
+      "combined_counts": {
+        "P2": 8,
+        "P3": 210,
+        "P4": 364,
+        "P5": 562
+      },
+      "combined_ranked_scales": [
+        {
+          "scale": "P5",
+          "count": 562
+        },
+        {
+          "scale": "P4",
+          "count": 364
+        },
+        {
+          "scale": "P3",
+          "count": 210
+        },
+        {
+          "scale": "P2",
+          "count": 8
+        }
+      ],
+      "best_scale": "P5",
+      "second_best_scale": "P4",
+      "best_minus_second_margin": 0.17307692307692307,
+      "split_consistent": true,
+      "auto_policy_allowed": true,
+      "mode": "preferred_scale",
+      "preferred_scale": "P5",
+      "weight_delta": {
+        "P5": 1.2,
+        "P2": 1.0,
+        "P3": 0.95,
+        "P4": 0.9
+      },
+      "rationale": "medium is split-consistent and the best-vs-second margin is 0.173, so P5 is auto-proposed.",
+      "fallback_reason": ""
+    },
+    "large": {
+      "size_group": "large",
+      "val_total_objects": 62,
+      "test_total_objects": 31,
+      "combined_total_objects": 93,
+      "val_dominant_scale": "P5",
+      "test_dominant_scale": "P5",
+      "combined_counts": {
+        "P2": 1,
+        "P3": 14,
+        "P4": 8,
+        "P5": 70
+      },
+      "combined_ranked_scales": [
+        {
+          "scale": "P5",
+          "count": 70
+        },
+        {
+          "scale": "P3",
+          "count": 14
+        },
+        {
+          "scale": "P4",
+          "count": 8
+        },
+        {
+          "scale": "P2",
+          "count": 1
+        }
+      ],
+      "best_scale": "P5",
+      "second_best_scale": "P3",
+      "best_minus_second_margin": 0.6021505376344086,
+      "split_consistent": true,
+      "auto_policy_allowed": true,
+      "mode": "preferred_scale",
+      "preferred_scale": "P5",
+      "weight_delta": {
+        "P5": 1.2,
+        "P2": 1.0,
+        "P3": 0.95,
+        "P4": 0.9
+      },
+      "rationale": "large is split-consistent and the best-vs-second margin is 0.602, so P5 is auto-proposed.",
+      "fallback_reason": ""
+    }
+  },
+  "identity_fallback_groups": [
+    "tiny",
+    "unknown"
+  ],
+  "metric_backlog": [
+    "energy_in_box",
+    "background_leakage",
+    "peak_alignment",
+    "scale_confidence_contribution",
+    "detection_error_correlation"
+  ],
+  "next_allowed_step": "review_m8_v1c_policy_mining_proposal_before_metric_runner",
+  "training_execution_allowed": false,
+  "evaluation_execution_allowed": false,
+  "inference_execution_allowed": false,
+  "dataset_mutation_allowed": false,
+  "checkpoint_mutation_allowed": false
+}
