@@ -1,0 +1,46 @@
+method_name: m8_v1b_size_aware_scale_weighting
+enabled: true
+implementation_phase: implementation_preparation_only
+supported_scales:
+  - P2
+  - P3
+  - P4
+  - P5
+size_thresholds:
+  small_max_pixel_area: 1024
+  medium_max_pixel_area: 9216
+size_groups:
+  - small
+  - medium
+  - large
+  - unknown
+scale_weights:
+  small:
+    P2: 1.05
+    P3: 1.15
+    P4: 0.95
+    P5: 0.90
+  medium:
+    P2: 0.90
+    P3: 1.00
+    P4: 1.10
+    P5: 1.15
+  large:
+    P2: 0.90
+    P3: 0.95
+    P4: 1.10
+    P5: 1.15
+  unknown:
+    P2: 1.00
+    P3: 1.00
+    P4: 1.00
+    P5: 1.00
+guardrails:
+  training_execution_allowed: false
+  evaluation_execution_allowed: false
+  inference_execution_allowed: false
+  dataset_mutation_allowed: false
+  checkpoint_mutation_allowed: false
+notes:
+  - Repo-local, inspectable, reversible implementation-preparation only.
+  - No training, validation, prediction, checkpoint loading, or dataset mutation is allowed in this phase.

@@ -1,0 +1,17 @@
+size_group,scale,old_weight,new_weight,delta,change_status
+small,P2,1.15,1.05,-0.1,changed
+small,P3,1.1,1.15,0.05,changed
+small,P4,0.95,0.95,0.0,unchanged
+small,P5,0.9,0.9,0.0,unchanged
+medium,P2,0.95,0.9,-0.05,changed
+medium,P3,1.1,1.0,-0.1,changed
+medium,P4,1.1,1.1,0.0,unchanged
+medium,P5,0.95,1.15,0.2,changed
+large,P2,0.9,0.9,0.0,unchanged
+large,P3,0.95,0.95,0.0,unchanged
+large,P4,1.1,1.1,0.0,unchanged
+large,P5,1.15,1.15,0.0,unchanged
+unknown,P2,1.0,1.0,0.0,unchanged
+unknown,P3,1.0,1.0,0.0,unchanged
+unknown,P4,1.0,1.0,0.0,unchanged
+unknown,P5,1.0,1.0,0.0,unchanged

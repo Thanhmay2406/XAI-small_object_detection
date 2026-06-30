@@ -1,0 +1,25 @@
+{
+  "phase": "M8_v1b.1",
+  "status": "m8_v1b_1_policy_alignment_patch_prepared",
+  "parent_phase": "M8_v1b",
+  "parent_status_verified": true,
+  "generated_at_utc": "2026-06-30T09:53:26.880495+00:00",
+  "artifacts_dir": "artifacts/m8_v1b_1_policy_alignment_patch",
+  "inputs_verified": {
+    "parent_summary": "artifacts/m8_v1b_size_aware_scale_weighting_implementation/m8_v1b_implementation_summary.json",
+    "parent_override": "artifacts/m8_v1b_size_aware_scale_weighting_implementation/m8_v1b_human_override_record.json",
+    "parent_policy": "artifacts/m8_v1b_size_aware_scale_weighting_implementation/m8_v1b_scale_weight_policy.csv",
+    "parent_size_policy": "artifacts/m8_v1b_size_aware_scale_weighting_implementation/m8_v1b_size_policy.csv",
+    "parent_manifest": "artifacts/m8_v1b_size_aware_scale_weighting_implementation/m8_v1b_non_execution_manifest.json",
+    "parent_check_report_present": true
+  },
+  "execution_flags": {
+    "training_execution_allowed": false,
+    "evaluation_execution_allowed": false,
+    "inference_execution_allowed": false,
+    "dataset_mutation_allowed": false,
+    "checkpoint_mutation_allowed": false
+  },
+  "evidence_alignment_status": "evidence_aligned",
+  "next_allowed_step": "review_m8_v1b_1_policy_alignment_before_training_gate"
+}

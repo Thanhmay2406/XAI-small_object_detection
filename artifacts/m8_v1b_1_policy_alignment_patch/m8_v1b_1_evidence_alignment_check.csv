@@ -1,0 +1,5 @@
+size_group,val_dominant_scale,test_dominant_scale,policy_highest_scale,alignment_result
+small,P3,P3,P3,pass
+medium,P5,P5,P5,pass
+large,P5,P5,P5,pass
+unknown,identity_fallback,identity_fallback,identity_all_1.0,pass

@@ -1,0 +1,25 @@
+{
+  "phase": "M8_v1b.1",
+  "status": "m8_v1b_1_policy_alignment_check_completed",
+  "generated_at_utc": "2026-06-30T09:53:26.910171+00:00",
+  "checks_passed": [
+    "size_group_classification_small_medium_large_unknown",
+    "small_highest_weight_is_p3",
+    "medium_highest_weight_is_p5",
+    "large_highest_weight_is_p5",
+    "unknown_weights_are_identity",
+    "feature_shapes_unchanged_for_mapping",
+    "feature_shapes_unchanged_for_sequence",
+    "policy_weights_applied_for_small_medium_large_unknown_with_alignment_patch",
+    "identity_fallback_uses_unknown_weights"
+  ],
+  "evidence_alignment_status": "evidence_aligned",
+  "synthetic_inputs_only": true,
+  "dataset_images_loaded": false,
+  "checkpoints_loaded": false,
+  "training_called": false,
+  "evaluation_called": false,
+  "inference_called": false,
+  "dataset_mutated": false,
+  "checkpoint_mutated": false
+}
