@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-model = YOLO('../configs/yolov8s-p2.yaml')
+model = YOLO('/kaggle/working/XAI-small_object_detection/configs/yolov8s-p2.yaml')
 
 '''
 python src/yolov8_p2.py \
