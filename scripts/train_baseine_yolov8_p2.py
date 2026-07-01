@@ -19,7 +19,7 @@ python src/yolov8_p2.py \
 
 model.train(
         data='/kaggle/input/datasets/thanhmay2406/dataset-for-research/drill_bit/data.yaml',
-        epochs=100,
+        epochs=1,
         imgsz=640,
         batch=16,
         device=0,
