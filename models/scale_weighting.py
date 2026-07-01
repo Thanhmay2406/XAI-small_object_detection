@@ -5,8 +5,6 @@ synthetic-only verification. It does not load checkpoints, datasets, or any
 Ultralytics internals.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 import math
 from typing import Mapping, Sequence
@@ -71,6 +69,82 @@ class ScaleWeightingPolicy:
     def weights_for_group(self, size_group: str | None) -> dict[str, float]:
         resolved_group = size_group if size_group in self.scale_weights else "unknown"
         return dict(self.scale_weights[resolved_group])
+
+
+@dataclass(frozen=True)
+class RuntimeIntegrationAdapter:
+    """Declarative adapter boundary for future trainer-time wiring.
+
+    This object intentionally does not patch Ultralytics or execute any runtime
+    hook. It only records the expected integration contract so callers can fail
+    closed until the real trainer/FPN insertion point exists.
+    """
+
+    method_name: str
+    supported_scales: tuple[str, ...]
+    size_groups: tuple[str, ...]
+    required_hook_point: str = "after multi-scale feature assembly and before Detect consumes P2/P3/P4/P5"
+    requires_size_metadata: bool = True
+    identity_fallback_group: str = "unknown"
+    runtime_integration_verified: bool = False
+
+
+def policy_from_config_payload(payload: Mapping[str, object]) -> ScaleWeightingPolicy:
+    """Build and validate a policy from a parsed method-config payload."""
+
+    supported_scales = payload.get("supported_scales")
+    size_groups = payload.get("size_groups")
+    size_thresholds = payload.get("size_thresholds")
+    scale_weights = payload.get("scale_weights")
+
+    if not isinstance(supported_scales, Sequence) or isinstance(supported_scales, (str, bytes)):
+        raise ValueError("supported_scales must be a sequence of scale names.")
+    if not isinstance(size_groups, Sequence) or isinstance(size_groups, (str, bytes)):
+        raise ValueError("size_groups must be a sequence of group names.")
+    if not isinstance(size_thresholds, Mapping):
+        raise ValueError("size_thresholds must be a mapping.")
+    if not isinstance(scale_weights, Mapping):
+        raise ValueError("scale_weights must be a mapping.")
+
+    small_max = size_thresholds.get("small_max_pixel_area")
+    medium_max = size_thresholds.get("medium_max_pixel_area")
+    if small_max is None or medium_max is None:
+        raise ValueError("size_thresholds must include small_max_pixel_area and medium_max_pixel_area.")
+
+    normalized_weights: dict[str, dict[str, float]] = {}
+    for group_name, group_weights in scale_weights.items():
+        if not isinstance(group_name, str):
+            raise ValueError("scale_weights keys must be strings.")
+        if not isinstance(group_weights, Mapping):
+            raise ValueError(f"scale_weights[{group_name!r}] must be a mapping.")
+        normalized_weights[group_name] = {}
+        for scale_name, weight in group_weights.items():
+            if not isinstance(scale_name, str):
+                raise ValueError(f"scale name for group {group_name!r} must be a string.")
+            normalized_weights[group_name][scale_name] = float(weight)
+
+    return ScaleWeightingPolicy(
+        supported_scales=tuple(str(scale_name) for scale_name in supported_scales),
+        size_thresholds=SizeThresholds(
+            small_max_area=float(small_max),
+            medium_max_area=float(medium_max),
+        ),
+        scale_weights=normalized_weights,
+    )
+
+
+def build_runtime_integration_adapter(
+    method_name: str,
+    policy: ScaleWeightingPolicy | None = None,
+) -> RuntimeIntegrationAdapter:
+    """Describe the expected future trainer-time integration boundary."""
+
+    resolved_policy = policy or ScaleWeightingPolicy()
+    return RuntimeIntegrationAdapter(
+        method_name=method_name,
+        supported_scales=resolved_policy.supported_scales,
+        size_groups=tuple(SIZE_GROUP_ORDER),
+    )
 
 
 def yolo_box_to_pixel_area(

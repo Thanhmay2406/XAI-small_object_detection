@@ -4,8 +4,6 @@ This module keeps the runtime hook local to the repo by subclassing the
 Ultralytics detection model and trainer rather than editing site-packages.
 """
 
-from __future__ import annotations
-
 from collections import Counter
 from dataclasses import dataclass, field
 import math
@@ -22,6 +20,7 @@ from ultralytics.utils import RANK
 from models.scale_weighting import SCALE_ORDER, SizeThresholds, classify_yolo_box_size_group
 
 SUPPORTED_SIZE_GROUPS = ("small", "medium", "large", "unknown")
+SUPPORTED_RUNTIME_APPLICATION_MODES = ("image_level_dominant_group", "instance_aware_spatial")
 
 
 @dataclass(frozen=True)
@@ -39,6 +38,7 @@ class M8V1CRuntimePolicy:
 
     method_name: str
     supported_scales: tuple[str, ...] = SCALE_ORDER
+    application_mode: str = "image_level_dominant_group"
     size_thresholds: SizeThresholds = field(default_factory=SizeThresholds)
     groups: dict[str, RuntimePolicyGroup] = field(default_factory=dict)
 
@@ -46,6 +46,11 @@ class M8V1CRuntimePolicy:
         object.__setattr__(self, "supported_scales", tuple(self.supported_scales))
         if self.supported_scales != SCALE_ORDER:
             raise ValueError(f"supported_scales must be exactly {SCALE_ORDER}, got {self.supported_scales!r}.")
+        if self.application_mode not in SUPPORTED_RUNTIME_APPLICATION_MODES:
+            raise ValueError(
+                "application_mode must be one of "
+                f"{SUPPORTED_RUNTIME_APPLICATION_MODES}, got {self.application_mode!r}."
+            )
 
         actual_groups = set(self.groups)
         expected_groups = set(SUPPORTED_SIZE_GROUPS)
@@ -101,6 +106,7 @@ def load_yaml_mapping(path: Path) -> dict[str, Any]:
 def runtime_policy_from_config_payload(payload: Mapping[str, Any]) -> M8V1CRuntimePolicy:
     method_name = str(payload.get("method_name", "m8_v1c_runtime_policy"))
     supported_scales = payload.get("supported_scales")
+    application_mode = str(payload.get("runtime_application_mode", "image_level_dominant_group"))
     size_thresholds = payload.get("size_thresholds")
     size_aware_policy = payload.get("size_aware_policy")
 
@@ -139,6 +145,7 @@ def runtime_policy_from_config_payload(payload: Mapping[str, Any]) -> M8V1CRunti
     return M8V1CRuntimePolicy(
         method_name=method_name,
         supported_scales=tuple(str(scale_name) for scale_name in supported_scales),
+        application_mode=application_mode,
         size_thresholds=SizeThresholds(
             small_max_area=float(small_max),
             medium_max_area=float(medium_max),
@@ -209,6 +216,70 @@ def infer_image_size_groups(
     return resolved_groups, debug_rows
 
 
+@dataclass(frozen=True)
+class RuntimeInstanceAnnotation:
+    sample_index: int
+    class_id: int | None
+    size_group: str
+    bbox_xywh_norm: tuple[float, float, float, float]
+
+
+def infer_instance_annotations(
+    batch: Mapping[str, torch.Tensor],
+    thresholds: SizeThresholds,
+) -> tuple[list[list[RuntimeInstanceAnnotation]], list[dict[str, Any]]]:
+    """Resolve per-instance GT annotations for spatial runtime weighting."""
+
+    images = batch.get("img")
+    batch_idx = batch.get("batch_idx")
+    bboxes = batch.get("bboxes")
+    cls_tensor = batch.get("cls")
+    if not isinstance(images, torch.Tensor) or not isinstance(batch_idx, torch.Tensor) or not isinstance(bboxes, torch.Tensor):
+        return [[]], [{"reason": "missing batch tensors"}]
+
+    batch_size = int(images.shape[0])
+    image_height = int(images.shape[2])
+    image_width = int(images.shape[3])
+    per_sample: list[list[RuntimeInstanceAnnotation]] = [[] for _ in range(batch_size)]
+    debug_rows: list[dict[str, Any]] = []
+
+    flat_batch_idx = batch_idx.view(-1).detach().cpu()
+    flat_bboxes = bboxes.detach().cpu()
+    flat_cls = cls_tensor.view(-1).detach().cpu() if isinstance(cls_tensor, torch.Tensor) else None
+    for object_index, (sample_index, bbox) in enumerate(zip(flat_batch_idx.tolist(), flat_bboxes.tolist(), strict=False)):
+        if not isinstance(sample_index, int) or sample_index < 0 or sample_index >= batch_size:
+            continue
+        if len(bbox) != 4:
+            continue
+        x_center, y_center, width_norm, height_norm = (float(value) for value in bbox)
+        size_group = classify_yolo_box_size_group(
+            width_norm,
+            height_norm,
+            image_width,
+            image_height,
+            thresholds,
+        )
+        class_id: int | None = None
+        if flat_cls is not None and object_index < len(flat_cls):
+            class_id = int(flat_cls[object_index].item())
+        annotation = RuntimeInstanceAnnotation(
+            sample_index=sample_index,
+            class_id=class_id,
+            size_group=size_group,
+            bbox_xywh_norm=(x_center, y_center, width_norm, height_norm),
+        )
+        per_sample[sample_index].append(annotation)
+        debug_rows.append(
+            {
+                "sample_index": sample_index,
+                "class_id": class_id,
+                "size_group": size_group,
+                "bbox_xywh_norm": [x_center, y_center, width_norm, height_norm],
+            }
+        )
+    return per_sample, debug_rows
+
+
 def _expand_scale_weights(
     tensor: torch.Tensor,
     size_groups: Sequence[str],
@@ -225,23 +296,96 @@ def _expand_scale_weights(
     return weight_tensor
 
 
+def _project_bbox_to_feature_window(
+    bbox_xywh_norm: tuple[float, float, float, float],
+    feature_height: int,
+    feature_width: int,
+) -> tuple[int, int, int, int] | None:
+    x_center, y_center, width_norm, height_norm = bbox_xywh_norm
+    x1 = int((x_center - (width_norm / 2.0)) * feature_width)
+    y1 = int((y_center - (height_norm / 2.0)) * feature_height)
+    x2 = int((x_center + (width_norm / 2.0)) * feature_width)
+    y2 = int((y_center + (height_norm / 2.0)) * feature_height)
+    x1 = max(0, min(feature_width, x1))
+    x2 = max(0, min(feature_width, x2))
+    y1 = max(0, min(feature_height, y1))
+    y2 = max(0, min(feature_height, y2))
+    if x2 <= x1 or y2 <= y1:
+        return None
+    return x1, y1, x2, y2
+
+
+def build_instance_aware_spatial_weights(
+    tensor: torch.Tensor,
+    per_sample_annotations: Sequence[Sequence[RuntimeInstanceAnnotation]],
+    scale_name: str,
+    policy: M8V1CRuntimePolicy,
+) -> tuple[torch.Tensor, dict[str, Any]]:
+    if tensor.ndim != 4:
+        raise ValueError(f"Feature tensor for {scale_name} must be 4D, got {tuple(tensor.shape)!r}.")
+
+    batch_size, _, feature_height, feature_width = tensor.shape
+    if len(per_sample_annotations) != batch_size:
+        raise ValueError(
+            f"Per-sample annotation batch size mismatch for {scale_name}: "
+            f"{len(per_sample_annotations)} vs feature batch {batch_size}."
+        )
+
+    spatial_sum = torch.zeros((batch_size, 1, feature_height, feature_width), dtype=tensor.dtype, device=tensor.device)
+    spatial_count = torch.zeros((batch_size, 1, feature_height, feature_width), dtype=tensor.dtype, device=tensor.device)
+    applied_boxes = 0
+    skipped_boxes = 0
+
+    for sample_index, annotations in enumerate(per_sample_annotations):
+        for annotation in annotations:
+            window = _project_bbox_to_feature_window(annotation.bbox_xywh_norm, feature_height, feature_width)
+            if window is None:
+                skipped_boxes += 1
+                continue
+            x1, y1, x2, y2 = window
+            weight = float(policy.weights_for_group(annotation.size_group).get(scale_name, 1.0))
+            spatial_sum[sample_index, 0, y1:y2, x1:x2] += weight
+            spatial_count[sample_index, 0, y1:y2, x1:x2] += 1.0
+            applied_boxes += 1
+
+    weight_map = torch.ones((batch_size, 1, feature_height, feature_width), dtype=tensor.dtype, device=tensor.device)
+    touched_mask = spatial_count > 0
+    weight_map = torch.where(touched_mask, spatial_sum / torch.clamp(spatial_count, min=1.0), weight_map)
+    debug = {
+        "scale": scale_name,
+        "feature_shape": [int(batch_size), int(tensor.shape[1]), int(feature_height), int(feature_width)],
+        "applied_boxes": applied_boxes,
+        "skipped_boxes": skipped_boxes,
+        "touched_pixels": int(touched_mask.sum().item()),
+    }
+    return weight_map, debug
+
+
 def apply_runtime_policy_to_features(
     features: Sequence[torch.Tensor],
-    size_groups: Sequence[str],
+    runtime_batch_metadata: Sequence[str] | Sequence[Sequence[RuntimeInstanceAnnotation]],
     policy: M8V1CRuntimePolicy,
-) -> list[torch.Tensor]:
+) -> tuple[list[torch.Tensor], dict[str, Any]]:
     if len(features) != len(policy.supported_scales):
         raise ValueError(
             f"Expected {len(policy.supported_scales)} feature tensors ordered as {policy.supported_scales}, "
             f"got {len(features)} tensors."
         )
     weighted: list[torch.Tensor] = []
+    debug_rows: list[dict[str, Any]] = []
     for scale_name, tensor in zip(policy.supported_scales, features, strict=False):
-        if tensor.ndim != 4:
-            raise ValueError(f"Feature tensor for {scale_name} must be 4D, got {tuple(tensor.shape)!r}.")
-        weight_tensor = _expand_scale_weights(tensor, size_groups, scale_name, policy)
+        if policy.application_mode == "instance_aware_spatial":
+            weight_tensor, debug_row = build_instance_aware_spatial_weights(
+                tensor,
+                runtime_batch_metadata,  # type: ignore[arg-type]
+                scale_name,
+                policy,
+            )
+            debug_rows.append(debug_row)
+        else:
+            weight_tensor = _expand_scale_weights(tensor, runtime_batch_metadata, scale_name, policy)  # type: ignore[arg-type]
         weighted.append(tensor * weight_tensor)
-    return weighted
+    return weighted, {"application_mode": policy.application_mode, "per_scale": debug_rows}
 
 
 class M8V1CRuntimeDetectionModel(DetectionModel):
@@ -259,6 +403,7 @@ class M8V1CRuntimeDetectionModel(DetectionModel):
         self.runtime_policy = runtime_policy
         self.runtime_method_integration_verified = False
         self.current_batch_size_groups: list[str] = []
+        self.current_batch_instance_annotations: list[list[RuntimeInstanceAnnotation]] = []
         self.current_batch_debug: list[dict[str, Any]] = []
         self.last_runtime_application: dict[str, Any] = {
             "applied": False,
@@ -269,12 +414,19 @@ class M8V1CRuntimeDetectionModel(DetectionModel):
         self.last_runtime_application = {"applied": False, "reason": "not_run_yet"}
 
     def set_runtime_batch_metadata(self, batch: Mapping[str, torch.Tensor]) -> None:
-        size_groups, debug_rows = infer_image_size_groups(batch, self.runtime_policy.size_thresholds)
-        self.current_batch_size_groups = size_groups
+        if self.runtime_policy.application_mode == "instance_aware_spatial":
+            instance_annotations, debug_rows = infer_instance_annotations(batch, self.runtime_policy.size_thresholds)
+            self.current_batch_instance_annotations = instance_annotations
+            self.current_batch_size_groups = []
+        else:
+            size_groups, debug_rows = infer_image_size_groups(batch, self.runtime_policy.size_thresholds)
+            self.current_batch_size_groups = size_groups
+            self.current_batch_instance_annotations = []
         self.current_batch_debug = debug_rows
 
     def clear_runtime_batch_metadata(self) -> None:
         self.current_batch_size_groups = []
+        self.current_batch_instance_annotations = []
         self.current_batch_debug = []
 
     def _apply_policy_if_needed(self, features: Any, detect_layer: torch.nn.Module) -> Any:
@@ -295,18 +447,27 @@ class M8V1CRuntimeDetectionModel(DetectionModel):
             return features
 
         batch_size = int(features[0].shape[0])
-        size_groups = self.current_batch_size_groups or ["unknown"] * batch_size
-        if len(size_groups) != batch_size:
-            size_groups = ["unknown"] * batch_size
+        runtime_batch_metadata: Sequence[str] | Sequence[Sequence[RuntimeInstanceAnnotation]]
+        if self.runtime_policy.application_mode == "instance_aware_spatial":
+            runtime_batch_metadata = self.current_batch_instance_annotations or [[] for _ in range(batch_size)]
+            if len(runtime_batch_metadata) != batch_size:
+                runtime_batch_metadata = [[] for _ in range(batch_size)]
+        else:
+            runtime_batch_metadata = self.current_batch_size_groups or ["unknown"] * batch_size
+            if len(runtime_batch_metadata) != batch_size:
+                runtime_batch_metadata = ["unknown"] * batch_size
 
-        weighted = apply_runtime_policy_to_features(features, size_groups, self.runtime_policy)
+        weighted, weighting_debug = apply_runtime_policy_to_features(features, runtime_batch_metadata, self.runtime_policy)
         self.last_runtime_application = {
             "applied": True,
             "reason": "runtime_scale_weighting_applied",
+            "application_mode": self.runtime_policy.application_mode,
             "detect_layer_index": getattr(detect_layer, "i", None),
             "detect_input_from": getattr(detect_layer, "f", None),
-            "size_groups": list(size_groups),
+            "size_groups": list(runtime_batch_metadata) if self.runtime_policy.application_mode != "instance_aware_spatial" else [],
+            "instance_annotation_count": sum(len(rows) for rows in self.current_batch_instance_annotations),
             "batch_debug": list(self.current_batch_debug),
+            "weighting_debug": weighting_debug,
             "supported_scales": list(self.runtime_policy.supported_scales),
         }
         return weighted

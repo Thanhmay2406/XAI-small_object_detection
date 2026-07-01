@@ -1,3 +1,0 @@
-size_group,combined_total_objects,val_dominant_scale,test_dominant_scale,best_minus_second_margin,fallback_reason
-tiny,11,P3,P2,0.000000,Tiny group remains identity because sample size is too small and split dominance is inconsistent.
-unknown,0,unknown,unknown,0.000000,Unknown size metadata must remain identity to fail closed.
