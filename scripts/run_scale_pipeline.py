@@ -6,8 +6,6 @@ sensitivity calibration, exports an instance-aware runtime policy, and only
 trains when both `--stage train` and `--execute` are present.
 """
 
-from __future__ import annotations
-
 import argparse
 import csv
 import json
